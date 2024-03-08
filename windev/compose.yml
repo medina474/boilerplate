@@ -1,0 +1,46 @@
+networks:
+  public-network:
+  windev-internal:
+    internal: true
+  proxy-internal:
+    external: true
+
+volumes:
+  hfsql-data:
+  webdev-data:
+
+services:
+  hfsql:
+    image: windev/hfsql:FR280094e
+    container_name: hfsql
+    networks:
+      - public-network
+      - windev-internal
+    volumes:
+      - hfsql-data:/var/lib/hfsql
+    ports:
+      - 4900:4900
+    environment:
+      HFSQL_USER: iut
+      HFSQL_PASSWORD: supermotdepasse
+
+  webdev:
+    image: windev/webdev:FR280095g
+    container_name: webdev
+    networks:
+      - proxy-internal
+      - windev-internal
+    ports:
+      - 8001:80
+    volumes:
+      - webdev-data:/var/lib/WEBDEV/28.0/
+    depends_on:
+      - hfsql
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdev.rule=Host(`webdev.reseaucocagne.org`)
+      - traefik.http.services.webdev.loadbalancer.server.port=80
+
+# http://127.0.0.1:8001/WDAdminWeb/
+# User : webdevuser
+# Password : Voir les logs Étape : 2/4
