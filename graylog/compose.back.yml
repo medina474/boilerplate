@@ -1,0 +1,25 @@
+services:
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+
+  graylog:
+    image: graylog/graylog:5.0.1
+    container_name: graylog
+    ports:
+      - 9000:9000
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PASSWORD_SECRET}
+      - GRAYLOG_ROOT_PASSWORD_SHA2=${GRAYLOG_ROOT_PASSWORD_SHA2}
+    depends_on:
+      opensearch:
+        condition: service_started
+      mongo:
+        condition: service_started
+    volumes:
+      - graylog_data:/usr/share/graylog/data/data
+      - graylog_journal:/usr/share/graylog/data/journal
