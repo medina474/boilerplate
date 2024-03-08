@@ -1,6 +1,3 @@
-volumes:
-  uptime_data:
-
 services:
 
   uptime:
@@ -10,4 +7,4 @@ services:
       - 3001:3001
     restart: unless-stopped
     volumes:
-      - uptime_data:/app/data
+      - ./data:/app/data
