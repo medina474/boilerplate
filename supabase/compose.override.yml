@@ -1,0 +1,111 @@
+name: sae5
+
+services:
+
+  studio:
+    container_name: sae5-studio
+
+  kong:
+    container_name: sae5-gateway
+
+  auth:
+    container_name: sae5-auth
+
+  rest:
+    container_name: sae5-rest
+
+  realtime:
+    container_name: realtime-dev.sae5-realtime
+
+  storage:
+    container_name: sae5-storage
+
+  imgproxy:
+    container_name: sae5-imgproxy
+
+  meta:
+    container_name: sae5-meta
+
+  functions:
+    container_name: sae5-edge-functions
+
+  analytics:
+    container_name: sae5-analytics
+
+  db:
+    container_name: sae5-postgresql
+    configs:
+      - source: db_directus
+        target: /docker-entrypoint-initdb.d/migrations/10-directus.sql
+
+  vector:
+    container_name: sae5-vector
+
+  mail:
+    container_name: sae5-mail
+    image: inbucket/inbucket
+    volumes:
+      - ./volumes/inbucket:/storage/
+      - ./volumes/inbucket/config:/config/
+    ports:
+      - 9000:9000/tcp
+      - 2500:2500/tcp
+      - 1100:1100/tcp
+
+  pgadmin:
+    container_name: sae5-pgadmin
+    image: dpage/pgadmin4:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DASHBOARD_USERNAME}
+      PGADMIN_DEFAULT_PASSWORD: ${DASHBOARD_PASSWORD}
+      PGADMIN_DISABLE_POSTFIX: true
+    volumes:
+      - ./volumes/pgadmin:/var/lib/pgadmin/
+    configs:
+      - source: pgadmin_config
+        target: /pgadmin4/servers.json
+    ports:
+      - 8001:80
+    restart: no
+
+  directus:
+    image: directus/directus:10.8
+    container_name: sae5-directus
+    ports:
+      - 8055:8055
+    volumes:
+      - ./volumes/directus/uploads:/directus/uploads
+      - ./volumes/directus/extensions:/directus/extensions
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      KEY: "255d861b-5ea1-5996-9aa3-922530ec40b1"
+      SECRET: "6116487b-cda1-52c2-b5b5-c8022c45e263"
+
+      DB_CLIENT: pg
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+      DB_CUSTOM_SCHEMA: directus
+      DB_SEARCH_PATH: "array:directus,public"
+
+      ADMIN_EMAIL: ${DASHBOARD_USERNAME}
+      ADMIN_PASSWORD: ${DASHBOARD_PASSWORD}
+
+      EMAIL_FROM: directus@sae5.fr
+      EMAIL_TRANSPORT: smtp
+      EMAIL_SMTP_HOST: ${SMTP_HOST}
+      EMAIL_SMTP_PORT: ${SMTP_PORT}
+
+configs:
+  pgadmin_config:
+    file: ./configs/pgadmin-servers.json
+  db_directus:
+    file: ./volumes/db/init/directus.sql
