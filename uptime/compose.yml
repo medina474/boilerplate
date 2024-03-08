@@ -4,10 +4,10 @@ volumes:
 services:
 
   uptime:
-    image: louislam/uptime-kuma:1.23.2-alpine
+    image: louislam/uptime-kuma:1.23.11-alpine
     container_name: uptime
-    volumes:
-      - uptime_data:/app/data
     ports:
       - 3001:3001
     restart: unless-stopped
+    volumes:
+      - uptime_data:/app/data

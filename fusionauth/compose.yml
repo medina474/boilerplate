@@ -1,7 +1,9 @@
-version: '3'
+volumes:
+  db_data:
+  fa_config:
 
 services:
-  
+
   fusionauth:
     image: fusionauth/fusionauth-app:latest
     container_name: fusionauth-app
@@ -27,7 +29,3 @@ services:
 networks:
   iutsd-net:
     external: true
-
-volumes:
-  db_data:
-  fa_config:
