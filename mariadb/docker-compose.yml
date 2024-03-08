@@ -1,0 +1,52 @@
+volumes:
+  pgadmin_data:
+#  pg_data:
+#  mariadb_data:
+
+networks:
+  default:
+    name: admin_net
+    external: true
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:8.3
+    container_name: pgadmin
+    restart: no
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin/
+    ports:
+      - 8001:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: e.medina@neotech.fr
+      PGADMIN_DEFAULT_PASSWORD: supermotdepasse
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: phpmyadmin
+    restart: no
+    ports:
+      - 8002:80
+    environment:
+      PMA_ARBITRARY: 1 # Allowing you to specify any MySQL/MariaDB server on the login page.
+
+#  postgres:
+#    image: postgres:15
+#    container_name: server_postgres
+#    restart: no
+#    volumes:
+#      - pg_data:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_USER: admin
+#      POSTGRES_PASSWORD: supermotdepasse
+
+#  mariadb:
+#    image: mariadb:11.0
+#    container_name: server_mariadb
+#    restart: no
+#    volumes:
+#      - mariadb_data:/var/lib/mysql
+#    environment:
+#      MARIADB_ROOT_PASSWORD: supermotdepasse
+#      MARIADB_USER: user
+#      MARIADB_PASSWORD: motdepasse
