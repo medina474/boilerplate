@@ -54,3 +54,4 @@ output.elasticsearch:
     certificate: "certs/es01/es01.crt"
     certificate_authorities: "certs/ca/ca.crt"
     key: "certs/es01/es01.key"
+
