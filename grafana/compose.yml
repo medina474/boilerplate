@@ -1,11 +1,10 @@
 volumes:
-  uptime:
-#  grafana:
-#  prometheus:
+  grafana:
+  prometheus:
 
-#configs:
-#  prometheus_config:
-#    file: prometheus/prometheus.yml
+configs:
+  prometheus_config:
+    file: prometheus/prometheus.yml
 
 networks:
   k6:
@@ -13,7 +12,7 @@ networks:
 services:
 
   grafana:
-    image: grafana/grafana-oss:10.0.0
+    image: grafana/grafana-oss:10.3.4
     container_name: grafana
     volumes:
       - grafana:/var/lib/grafana
@@ -40,20 +39,27 @@ services:
       - 9090:9090
     restart: unless-stopped
 
-  siteinspector:
-    image: siteinspector/siteinspector:latest
-    container_name: siteinspector
-    volumes:
-      - uptime:/app/data
+  loki:
+    image: grafana/loki:2.9.2
     ports:
-      - 3001:3001
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
 
-  k6:
-    image: grafana/k6:0.47.0
-    networks:
-      - k6
-    ports:
-      - 6565:6565
+
+  # siteinspector:
+  #   image: siteinspector/siteinspector:latest
+  #   container_name: siteinspector
+  #   volumes:
+  #     - uptime:/app/data
+  #   ports:
+  #     - 3001:3001
+
+  # k6:
+  #   image: grafana/k6:0.47.0
+  #   networks:
+  #     - k6
+  #   ports:
+  #     - 6565:6565
   #  environment:
   #    - K6_OUT=influxdb=http://influxdb:8086/k6
   #  volumes:
