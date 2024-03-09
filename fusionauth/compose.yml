@@ -18,8 +18,7 @@ services:
       FUSIONAUTH_APP_URL: http://fusionauth:9011
       SEARCH_TYPE: database
 
-    networks:
-     - iutsd-net
+
     restart: unless-stopped
     ports:
       - 9011:9011

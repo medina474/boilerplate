@@ -21,8 +21,8 @@ services:
     ports:
       - 4900:4900
     environment:
-      HFSQL_USER: iut
-      HFSQL_PASSWORD: supermotdepasse
+      HFSQL_USER: ${HFSQL_USER}
+      HFSQL_PASSWORD: ${HFSQL_PASSWORD}
 
   webdev:
     image: windev/webdev:FR280095g
