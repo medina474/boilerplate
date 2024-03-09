@@ -12,15 +12,6 @@ networks:
 
 services:
 
-  uptime:
-    image: louislam/uptime-kuma:1.23.8-alpine
-    container_name: uptime
-    volumes:
-      - uptime:/app/data
-    ports:
-      - 3001:3001
-    restart: unless-stopped
-
   grafana:
     image: grafana/grafana-oss:10.0.0
     container_name: grafana
@@ -35,19 +26,19 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
 
-#  prometheus:
-#    image: prom/prometheus:v2.44.0
-#    container_name: prometheus
-#    command:
-#      - '--config.file=/etc/prometheus/prometheus.yml'
-#    configs:
-#      - source: prometheus_config
-#        target: /etc/prometheus/prometheus.yml
-#    volumes:
-#      - prometheus:/prometheus
-#    ports:
-#      - 9090:9090
-#    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus:/prometheus
+    ports:
+      - 9090:9090
+    restart: unless-stopped
 
   siteinspector:
     image: siteinspector/siteinspector:latest
