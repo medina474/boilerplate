@@ -173,7 +173,7 @@ services:
   #     - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
   #     - ELASTIC_HOSTS=https://es01:9200
   #     - KIBANA_HOSTS=http://kibana:5601
-  #     - LOGSTASH_HOSTS=http://logstash01:9600
+  #     - LOGSTASH_HOSTS=http://logstash:9600
   #   command:
   #     - --strict.perms=false
 
@@ -201,7 +201,8 @@ services:
   #     - --strict.perms=false
 
   # Pipeline côté serveur destiné au traitement des données
-  logstash01:
+  logstash:
+    container_name: logstash
     depends_on:
       es01:
         condition: service_healthy
