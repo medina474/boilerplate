@@ -12,21 +12,21 @@ networks:
 services:
 
   grafana:
-    image: grafana/grafana-oss:10.3.4
+    image: grafana/grafana-oss:${GF_VERSION}
     container_name: grafana
     volumes:
-      - grafana:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana
       - ./grafana_datasources:/etc/grafana/provisioning/datasources
     ports:
-      - 3000:3000
+      - ${GF_PORT}:3000
     environment:
-      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-      - GF_USERS_ALLOW_SIGN_UP=false
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: false
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:v2.44.0
+    image: prom/prometheus:${PROMETHEUS_VERSION}
     container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -36,15 +36,14 @@ services:
     volumes:
       - prometheus:/prometheus
     ports:
-      - 9090:9090
+      - ${PROMETHEUS_PORT}:9090
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:2.9.2
+    image: grafana/loki:${LOKI_VERSION}
     ports:
-      - "3100:3100"
+      - ${LOKI_PORT}:3100
     command: -config.file=/etc/loki/local-config.yaml
-
 
   # siteinspector:
   #   image: siteinspector/siteinspector:latest
