@@ -9,17 +9,6 @@ networks:
     external: true
 
 services:
-  pgadmin:
-    image: dpage/pgadmin4:8.3
-    container_name: pgadmin
-    restart: no
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin/
-    ports:
-      - 8001:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: e.medina@neotech.fr
-      PGADMIN_DEFAULT_PASSWORD: supermotdepasse
 
   phpmyadmin:
     image: phpmyadmin:5.2
