@@ -12,8 +12,8 @@ networks:
 services:
 
   grafana:
-    image: grafana/grafana-oss:${GF_VERSION}
     container_name: grafana
+    image: grafana/grafana-oss:${GF_VERSION}
     volumes:
       - ./data/grafana:/var/lib/grafana
       - ./grafana_datasources:/etc/grafana/provisioning/datasources
@@ -26,8 +26,8 @@ services:
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION}
     container_name: prometheus
+    image: prom/prometheus:${PROMETHEUS_VERSION}
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     configs:
@@ -40,6 +40,7 @@ services:
     restart: unless-stopped
 
   loki:
+    container_name: loki
     image: grafana/loki:${LOKI_VERSION}
     ports:
       - ${LOKI_PORT}:3100
