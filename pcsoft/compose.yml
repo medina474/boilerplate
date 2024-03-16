@@ -11,7 +11,7 @@ volumes:
 
 services:
   hfsql:
-    image: windev/hfsql:FR280094e
+    image: windev/hfsql:${HFSQL_VERSION}
     container_name: hfsql
     networks:
       - public-network
@@ -25,13 +25,13 @@ services:
       HFSQL_PASSWORD: ${HFSQL_PASSWORD}
 
   webdev:
-    image: windev/webdev:FR280095g
+    image: windev/webdev:${WEBDEV_VERSION}
     container_name: webdev
     networks:
       - proxy-internal
       - windev-internal
     ports:
-      - 8001:80
+      - ${WEBDEV_PORT}:80
     volumes:
       - webdev-data:/var/lib/WEBDEV/28.0/
     depends_on:
