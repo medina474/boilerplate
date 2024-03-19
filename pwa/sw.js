@@ -4,7 +4,9 @@
 // https://github.com/DefinitelyTyped/DefinitelyTyped/tree/HEAD/service_worker_api
 // https://jcs.wtf/service-worker-stale-while-revalidate/
 // https://maxtsh.medium.com/caching-strategies-for-front-end-developers-using-a-service-worker-6264d249f080
-var cacheName = 'epwa';
+
+const version = "1.0.1";
+const cacheName = `cache-${version}`;
 
 var filesToCache = [
 
@@ -25,15 +27,6 @@ var filesToCache = [
   //'https://fonts.googleapis.com/css?family=Raleway'
 ];
 
-// todo: check if service worker is installed before
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(function () {
-    console.info('sw: registration ok');
-  }).catch(function (err) {
-    console.error(err);
-  });
-}
-
 /**
  * 'Install' event. Writing files to browser cache
  *
@@ -41,13 +34,15 @@ if ('serviceWorker' in navigator) {
  * @param {function} Callback function with event data
  *
  */
-self.addEventListener('install', function (event) {
-  event.waitUntil(
-    caches.open(cacheName).then(function (cache) {
-      console.log('sw: writing files into cache');
-      return cache.addAll(filesToCache);
-    })
-  )
+self.addEventListener("install", (event) => {
+  console.log("sw is installed");
+  const channel = new BroadcastChannel("sw-messages");
+  channel.postMessage({ version });
+});
+
+// This allows the web app to trigger skipWaiting
+self.addEventListener("message", (event) => {
+  if (event?.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 /**
@@ -57,9 +52,23 @@ self.addEventListener('install', function (event) {
  * @param {function} Callback function with event data
  *
  */
-self.addEventListener('activate', function (event) {
-  console.log('sw: service worker ready and activated', event);
-});
+self.addEventListener("activate", (event) => {
+  console.log("sw is activated");
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== cacheName).map((nm) => caches.delete(nm)),
+      );
+    }),
+  )
+
+  /* event.waitUntil(
+    caches.open(cacheName).then(function (cache) {
+      console.log('sw: writing files into cache');
+      return cache.addAll(filesToCache);
+    })
+  )*/
+})
 
 /**
  * 'Fetch' event. Browser tries to get resources making a request
@@ -79,7 +88,7 @@ self.addEventListener('fetch', function (event) {
   const isHTML = event.request.mode === "navigate";
   const isDomJS = url.pathname.includes("dom.js");
   const isJS = isAsset && url.pathname.includes(".js");
-  const isImage = ["jpg", "jpeg", "png"].some((mim) =>
+  const isImage = ["jpg", "jpeg", "png", "webp"].some((mim) =>
     url.pathname.includes(`.${mim}`),
   );
   const isCSS = isAsset && url.pathname.includes(".css");
@@ -93,15 +102,15 @@ self.addEventListener('fetch', function (event) {
   const isExternal = mode === "cors" || url.hostname !== selfURL.hostname;
 
   if (isOnline) {
-    if (isImage || isJSON || isFont) event.respondWith(cacheFirst(ev));
+    if (isImage || isJSON || isFont) event.respondWith(cacheFirst(event));
 
     if (!isDomJS && !isHTML) {
       if (isJS || isCSS) {
-        event.respondWith(networkFirst(ev));
+        event.respondWith(networkFirst(event));
       }
     }
   } else {
-    event.respondWith(cacheOnly(ev));
+    event.respondWith(cacheOnly(event));
   }
 
 })

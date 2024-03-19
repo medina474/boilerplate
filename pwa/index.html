@@ -14,7 +14,35 @@
 
 
   <img src="images/icon-512.png">
-  <script src="sw.js" type="text/javascript"></script>
+  <script>
+  let intervalId
+  document.addEventListener("DOMContentLoaded", async () => {
+      if ("serviceWorker" in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register("sw.js", {
+            scope: "/",
+          });
+
+          if (intervalId) clearInterval(intervalId);
+          intervalId = setInterval(() => {
+              console.log('sw update ?')
+              registration.update();
+            },
+            1 * 60 * 1000,
+          );
+
+          registration.addEventListener("updatefound", () => {
+            console.log("sw update found");
+            registration?.waiting?.postMessage({
+              type: "SKIP_WAITING",
+            });
+          });
+        } catch (err) {
+          console.log("SW registration failed", err);
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
