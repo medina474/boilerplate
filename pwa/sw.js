@@ -5,7 +5,7 @@
 // https://jcs.wtf/service-worker-stale-while-revalidate/
 // https://maxtsh.medium.com/caching-strategies-for-front-end-developers-using-a-service-worker-6264d249f080
 
-const version = "1.0.1";
+const version = "1.0.11";
 const cacheName = `cache-${version}`;
 
 var filesToCache = [
@@ -16,7 +16,9 @@ var filesToCache = [
   'sw.js',
   'manifest.json',
   'images/icon-512.png',
-  'images/icons-vector.svg'
+  'images/icons-vector.svg',
+  'monk.html',
+  'monk2.html'
   //'favicon.png',
 
   // app files
@@ -53,22 +55,26 @@ self.addEventListener("message", (event) => {
  *
  */
 self.addEventListener("activate", (event) => {
-  console.log("sw is activated");
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== cacheName).map((nm) => caches.delete(nm)),
-      );
-    }),
-  )
-
-  /* event.waitUntil(
-    caches.open(cacheName).then(function (cache) {
-      console.log('sw: writing files into cache');
-      return cache.addAll(filesToCache);
-    })
-  )*/
+  event.waitUntil(Promise.all([
+    caches.open(cacheName).then(cache => cache.addAll(filesToCache)),
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== cacheName).map((nm) => caches.delete(nm))
+    ))
+  ]))
+  console.log(`sw is activated with ${cacheName}`);
 })
+
+/*
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== cacheName).map((nm) => caches.delete(nm))
+      )),
+      caches.open(cacheName).then((cache) => cache.addAll(filesToCache))
+      )
+    console.log("sw is activated");
+})
+*/
 
 /**
  * 'Fetch' event. Browser tries to get resources making a request
