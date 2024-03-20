@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="rebeccapurple">
+</head>
+
+<body>
+  <h1>Progressive Web App</h1>
+
+
+  <img src="images/icon-512.png">
+  <script>
+  let intervalId
+  document.addEventListener("DOMContentLoaded", async () => {
+      if ("serviceWorker" in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register("sw.js", {
+            scope: "/",
+          });
+
+          if (intervalId) clearInterval(intervalId);
+          intervalId = setInterval(() => {
+              console.log('sw update ?')
+              registration.update();
+            },
+            1 * 60 * 1000,
+          );
+
+          registration.addEventListener("updatefound", () => {
+            console.log("sw update found");
+            registration?.waiting?.postMessage({
+              type: "SKIP_WAITING",
+            });
+          });
+        } catch (err) {
+          console.log("SW registration failed", err);
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
