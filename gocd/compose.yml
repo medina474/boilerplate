@@ -1,0 +1,7 @@
+services:
+
+  gocd:
+    container_name: gocd
+    image: gocd/gocd-server:${GOCD_VERSION}
+    ports:
+      - ${GOCD_PORT}:8153
