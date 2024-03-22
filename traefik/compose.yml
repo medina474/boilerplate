@@ -15,7 +15,7 @@ services:
       #- 8080:8080 # Dashboard port
     labels:
       traefik.enable: true
-      traefik.http.routers.api.rule: Host(`${TRAEFIK_HOST}`)
+      traefik.http.routers.api.rule: ${DASHBOARD_TRAEFIK_RULE}
       traefik.http.routers.api.entryPoints: web
       traefik.http.routers.api.service: api@internal
     volumes:
