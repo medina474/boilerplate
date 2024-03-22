@@ -6295,7 +6295,11 @@ body#checkout section.checkout-step.-reachable.-complete h1 .done {
 }
 
 .top-menu[data-depth="1"] {
-  margin: .625rem
+  margin: .625rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  max-height: 75vh;
 }
 
 .top-menu[data-depth="0"] {
@@ -6322,7 +6326,10 @@ body#checkout section.checkout-step.-reachable.-complete h1 .done {
 }
 
 .top-menu a[data-depth="1"] {
-  padding: 0 .625rem .625rem 0
+  padding: 0 .625rem 0 0;
+  margin-bottom: .625rem;
+  border-bottom: 1px solid #b51531;
+  color: #003aad;
 }
 
 .top-menu a[data-depth="2"] {
@@ -6331,6 +6338,11 @@ body#checkout section.checkout-step.-reachable.-complete h1 .done {
 
 .top-menu[data-depth="2"] {
   line-height: 1.25;
+  min-width: 20%;
+}
+
+.top-menu[data-depth="3"] {
+  display:none;
 }
 
 .top-menu .collapse {
