@@ -2,8 +2,6 @@ networks:
   public-network:
   windev-internal:
     internal: true
-  proxy-internal:
-    external: true
 
 volumes:
   hfsql-data:
@@ -17,7 +15,7 @@ services:
       - public-network
       - windev-internal
     volumes:
-      - hfsql-data:/var/lib/hfsql
+      - ./data/hfsql:/var/lib/hfsql
     ports:
       - 4900:4900
     environment:
@@ -28,18 +26,14 @@ services:
     image: windev/webdev:${WEBDEV_VERSION}
     container_name: webdev
     networks:
-      - proxy-internal
+      - webdev_network
       - windev-internal
-    ports:
-      - ${WEBDEV_PORT}:80
+    #ports:
+    #  - ${WEBDEV_PORT}:80
     volumes:
-      - webdev-data:/var/lib/WEBDEV/28.0/
+      - ./data/webdev:/var/lib/WEBDEV/29.0/
     depends_on:
       - hfsql
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.webdev.rule=Host(`${WEBDEV_HOST}`)
-      - traefik.http.services.webdev.loadbalancer.server.port=80
 
 # http://127.0.0.1:8001/WDAdminWeb/
 # User : webdevuser

@@ -49,3 +49,7 @@ networks:
   nodered_network:
     name: nodered_network
     external: true
+
+  webdev_network:
+    name: webdev_network
+    external: true
