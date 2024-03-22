@@ -9,4 +9,4 @@ services:
      image:
 
   telegraf:
-    image: telegraf:1.29-alpine
+    image: telegraf:${TELEGRAF_VERSION}
