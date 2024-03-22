@@ -38,7 +38,7 @@ services:
       - hfsql
     labels:
       - traefik.enable=true
-      - traefik.http.routers.webdev.rule=Host(`webdev.reseaucocagne.org`)
+      - traefik.http.routers.webdev.rule=Host(`${WEBDEV_HOST}`)
       - traefik.http.services.webdev.loadbalancer.server.port=80
 
 # http://127.0.0.1:8001/WDAdminWeb/
