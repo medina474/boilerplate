@@ -11,6 +11,6 @@ services:
       - ./data:/data
     labels:
       traefik.enable: true
-      traefik.http.services.uptime.loadbalancer.server.port: 1880
+      traefik.http.services.nodered.loadbalancer.server.port: 1880
       traefik.http.routers.nodered.rule: ${NODERED_TRAEFIK_RULE}
       traefik.http.routers.nodered.entrypoints: web

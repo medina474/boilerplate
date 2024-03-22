@@ -10,6 +10,8 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
     ports:
       - 80:80
       #- 8080:8080 # Dashboard port
@@ -23,6 +25,7 @@ services:
     networks:
      - uptime_network
      - whoiam_network
+     - nodered_network
 
   whoami:
     image: traefik/whoami
@@ -35,9 +38,14 @@ services:
      - whoiam_network
 
 networks:
+  whoiam_network:
+    name: whoiam_network
+    driver: bridge
+
   uptime_network:
     name: uptime_network
     external: true
 
-  whoiam_network:
-    driver: bridge
+  nodered_network:
+    name: nodered_network
+    external: true

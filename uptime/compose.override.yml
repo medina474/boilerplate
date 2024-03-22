@@ -1,0 +1,10 @@
+services:
+
+  uptime:
+    networks:
+      - uptime_network
+
+networks:
+  uptime_network:
+    name: uptime_network
+    driver: bridge

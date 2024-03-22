@@ -1,1 +1,10 @@
-name: nodered
+services:
+
+  nodered:
+    networks:
+      - nodered_network
+
+networks:
+  nodered_network:
+    name: nodered_network
+    driver: bridge
