@@ -5,3 +5,8 @@ services:
     image: gocd/gocd-server:${GOCD_VERSION}
     ports:
       - ${GOCD_PORT}:8153
+    labels:
+      traefik.enable: true
+      traefik.http.services.uptime.loadbalancer.server.port: 1880
+      traefik.http.routers.gocd.rule: ${GOCD_TRAEFIK_RULE}
+      traefik.http.routers.gocd.entrypoints: web
