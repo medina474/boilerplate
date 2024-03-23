@@ -39,3 +39,5 @@ services:
     minio_init:
       networks:
         - proxy_network
+
+    

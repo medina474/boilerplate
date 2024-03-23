@@ -135,6 +135,19 @@ services:
       - ./data/alertmanager:/alertmanager
     command: --config.file=/etc/alertmanager/alertmanager.yml --log.level=debug
 
-# based on https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
+  fakelog:
+    container_name: fake_logs
+    image: mingrammer/flog
+    command:
+      - --loop
+      - --format=json
+      - --number=1
+      - --delay=500ms
+      - --overwrite
+      - --type=stdout
+    logging: *default-logging
+
+# based on 
+# https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
 # https://github.com/stefanprodan/dockprom
 # https://yoandev.co/superviser-ses-conteneurs-docker-avec-prometheus/grafana-et-stressons-la-solution-avec-une-api-symfony-et-postman/
