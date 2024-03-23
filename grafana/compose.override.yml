@@ -35,3 +35,7 @@ services:
         traefik.http.routers.minio.entrypoints: web
         traefik.http.routers.minio.rule: ${MINIO_TRAEFIK_RULE}
         traefik.http.services.minio.loadbalancer.server.port: ${MINIO_PORT}
+
+    minio_init:
+      networks:
+        - proxy_network
