@@ -118,7 +118,7 @@ services:
       /usr/bin/mc config host add minio1 http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc rm -r --force minio1/loki;
       /usr/bin/mc mb minio1/loki;
-      /usr/bin/mc admin prometheus generate minio1 bucket --public
+      /usr/bin/mc admin prometheus generate minio1 bucket --public;
       /usr/bin/mc admin info minio1;
       exit 0;
       "
