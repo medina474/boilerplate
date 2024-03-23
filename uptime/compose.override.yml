@@ -1,3 +1,8 @@
+networks:
+  proxy_network:
+    name: proxy_network
+    external: true
+
 services:
 
   uptime:
@@ -8,8 +13,3 @@ services:
       traefik.http.services.uptime.loadbalancer.server.port: 3001
       traefik.http.routers.uptime.rule: ${UPTIME_TRAEFIK_RULE}
 
-networks:
-
-  proxy_network:
-    name: proxy_network
-    external: true

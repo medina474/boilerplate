@@ -3,8 +3,8 @@ services:
   uptime:
     container_name: uptime
     image: louislam/uptime-kuma:${UPTIME_VERSION}
+    restart: unless-stopped
     #ports:
     #  - ${UPTIME_PORT}:3001
-    restart: unless-stopped
     volumes:
       - ./data:/app/data

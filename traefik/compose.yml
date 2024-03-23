@@ -1,14 +1,20 @@
+networks:
+
+  proxy_network:
+    name: proxy_network
+    driver: bridge
+
 services:
 
   traefik:
     image: traefik:${TRAEFIK_VERSION}
     container_name: traefik
     command:
-      #- "--log.level=DEBUG"
+      - "--entrypoints.web.address=:80"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      #- "--log.level=DEBUG"
     restart: unless-stopped
     environment:
       TZ: Europe/Paris
@@ -34,9 +40,3 @@ services:
       traefik.http.routers.whoami.entrypoints: web
     networks:
      - proxy_network
-
-networks:
-
-  proxy_network:
-    name: proxy_network
-    driver: bridge
