@@ -137,6 +137,24 @@ services:
     volumes:
       - ./data/alertmanager:/alertmanager
 
+## FAKE
+
+  smtp4dev:
+    container_name: smtp4dev
+    image: rnwood/smtp4dev:${SMTP4DEV_VERSION}
+    networks:
+      - proxy_network
+    volumes:
+      - ./data/smtp4dev:/smtp4dev
+    ports:
+      - ${SMTP4DEV_PORT}:8080
+      - 25:25
+      - 143:143
+    environment:
+      - ServerOptions__HostName=boilerplate.docker.local
+      - ServerOptions__BasePath=/smtp4dev
+    logging: *default-logging
+
   fakelog:
     container_name: fake_logs
     image: mingrammer/flog

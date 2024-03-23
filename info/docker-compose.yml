@@ -70,30 +70,6 @@ services:
     logging:
       << : *default-logging
 
-  smtp:
-    container_name: info-smtp
-    image: rnwood/smtp4dev:3.2.0-ci20221023104
-    networks:
-      - proxy-internal
-    volumes:
-      - smtp4dev:/smtp4dev
-    environment:
-      - ServerOptions__HostName=localhost
-      - ServerOptions__BasePath=/smtp4dev
-    logging: *default-logging
-
-  fakelog:
-    image: mingrammer/flog
-    container_name: fake_logs
-    command:
-      - --loop
-      - --format=json
-      - --number=1
-      - --delay=500ms
-      - --overwrite
-      - --type=stdout
-    logging: *default-logging
-
 ## GRAFANA
 
   grafana:
