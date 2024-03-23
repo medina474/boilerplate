@@ -219,16 +219,4 @@ services:
       - grafana-internal
       - loki-internal
 
-  alertmanager:
-    container_name: info-alertmanager
-    image: prom/alertmanager:v0.26.0
-    ports:
-      - 9093:9093
-    configs:
-      - source: alertmanager_config
-        target: /etc/alertmanager
-    volumes:
-      - alertmanager:/alertmanager
-    command: --config.file=/etc/alertmanager/alertmanager.yml --log.level=debug
-
 # https://wiki-tech.io/Donn%C3%A9es/Grafana/Loki
