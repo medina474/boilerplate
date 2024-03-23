@@ -1,14 +1,16 @@
 apiVersion: 1
 
 datasources:
-  - name: prometheus
+  - name: Prometheus
     type: prometheus
     url: http://prometheus:9090/prometheus
     orgId: 1
+    isDefault: false
     access: proxy
+    editable: true
     jsonData:
       httpMethod: POST
       prometheusType: Prometheus
-      prometheusVersion: 2.48.0
+      prometheusVersion: 2.50.0
 
 # http://localhost/grafana/api/datasources

@@ -23,7 +23,13 @@ services:
         traefik.http.routers.prometheus.rule: ${PROMETHEUS_TRAEFIK_RULE}
         traefik.http.services.prometheus.loadbalancer.server.port: ${PROMETHEUS_PORT}
 
+    loki:
+      networks:
+        - proxy_network
+    
     minio:
+      networks:
+        - proxy_network
       labels:
         traefik.enable: true
         traefik.http.routers.minio.entrypoints: web
