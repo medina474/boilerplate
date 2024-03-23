@@ -64,6 +64,7 @@ services:
   loki:
     container_name: loki
     image: grafana/loki:${LOKI_VERSION}
+    command: -config.file=/etc/loki/local-config.yaml
     depends_on:
       - minio
     configs:
@@ -72,7 +73,6 @@ services:
     ports:
       - ${LOKI_PORT}:3100
       - 9095:9095
-    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./data/loki:/loki
 
@@ -107,7 +107,6 @@ services:
   # Create a service that only creates a default bucket.
   # /usr/bin/mc policy set download minio1/loki;
   # /usr/bin/mc admin update minio1 --yes;
-  # /usr/bin/mc admin prometheus generate minio1 bucket --public;
   minio_init:
     container_name: minio_init
     image: minio/mc
@@ -118,6 +117,7 @@ services:
       /usr/bin/mc config host add minio1 http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc rm -r --force minio1/loki;
       /usr/bin/mc mb minio1/loki;
+      /usr/bin/mc policy set public minio1/loki;
       /usr/bin/mc admin prometheus generate minio1 bucket --public;
       /usr/bin/mc admin info minio1;
       exit 0;
@@ -125,15 +125,15 @@ services:
 
   alertmanager:
     container_name: alertmanager
-    image: prom/alertmanager:v0.26.0
+    image: prom/alertmanager:${ALERTMANAGER_VERSION}
+    command: --config.file=/etc/alertmanager/alertmanager.yml --log.level=debug
     ports:
-      - 9093:9093
+      - ${ALERTMANAGER_PORT}:9093
     configs:
       - source: alertmanager_config
         target: /etc/alertmanager
     volumes:
       - ./data/alertmanager:/alertmanager
-    command: --config.file=/etc/alertmanager/alertmanager.yml --log.level=debug
 
   fakelog:
     container_name: fake_logs
@@ -147,7 +147,10 @@ services:
       - --type=stdout
     logging: *default-logging
 
-# based on 
+# based on
 # https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
 # https://github.com/stefanprodan/dockprom
 # https://yoandev.co/superviser-ses-conteneurs-docker-avec-prometheus/grafana-et-stressons-la-solution-avec-une-api-symfony-et-postman/
+# https://hackernoon.com/fr/comment-d%C3%A9ployer-grafana-loki-et-enregistrer-des-donn%C3%A9es-sur-minio-%C3%A0-l'aide-de-conteneurs-docker-ou-directement-depuis-la-source
+# https://blog.min.io/how-to-grafana-loki-minio/
+# https://github.com/cniackz/loki?ref=blog.min.io

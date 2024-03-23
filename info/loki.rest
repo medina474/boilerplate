@@ -17,19 +17,3 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3100/loki/api/v1/query?query=sum(rate({job="varlogs"}[30m])) by (level)
-
-
-###
-GET http://localhost:3100/ready
-
-###
-GET http://localhost:3100/log_level
-
-###
-GET http://localhost:3100/metrics
-
-###
-GET http://localhost:3100//config
-
-###
-GET http://localhost:3100/services

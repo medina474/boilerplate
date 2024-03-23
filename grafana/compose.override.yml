@@ -23,10 +23,6 @@ services:
         traefik.http.routers.prometheus.rule: ${PROMETHEUS_TRAEFIK_RULE}
         traefik.http.services.prometheus.loadbalancer.server.port: ${PROMETHEUS_PORT}
 
-    loki:
-      networks:
-        - proxy_network
-    
     minio:
       networks:
         - proxy_network
@@ -36,8 +32,19 @@ services:
         traefik.http.routers.minio.rule: ${MINIO_TRAEFIK_RULE}
         traefik.http.services.minio.loadbalancer.server.port: ${MINIO_PORT}
 
-    minio_init:
+    alertmanager:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.alertmanager.entrypoints: web
+        traefik.http.routers.alertmanager.rule: ${ALERTMANAGER_TRAEFIK_RULE}
+        traefik.http.services.alertmanager.loadbalancer.server.port: ${ALERTMANAGER_PORT}
+
+    loki:
       networks:
         - proxy_network
 
-    
+    minio_init:
+      networks:
+        - proxy_network

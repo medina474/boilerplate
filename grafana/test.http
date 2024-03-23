@@ -1,0 +1,14 @@
+### Loki
+GET http://localhost:3100/ready
+
+###
+GET http://localhost:3100/services
+
+### Loki
+GET http://localhost:3100/log_level
+
+### Loki metrics
+GET http://localhost:3100/metrics
+
+###
+GET http://localhost:3100//config
