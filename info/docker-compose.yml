@@ -87,6 +87,18 @@ services:
       - ServerOptions__BasePath=/smtp4dev
     logging: *default-logging
 
+  fakelog:
+    image: mingrammer/flog
+    container_name: fake_logs
+    command:
+      - --loop
+      - --format=json
+      - --number=1
+      - --delay=500ms
+      - --overwrite
+      - --type=stdout
+    logging: *default-logging
+
 ## GRAFANA
 
   grafana:
@@ -111,9 +123,6 @@ services:
       - traefik.http.routers.grafana.entrypoints=web
       - traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)
       - traefik.http.services.grafana.loadbalancer.server.port=80
-    depends_on:
-      - loki
-      - prometheus
     environment:
       GF_SECURITY_ADMIN_USER: ${USER}
       GF_SECURITY_ADMIN_PASSWORD: ${PASSWORD}
@@ -134,7 +143,7 @@ services:
     volumes:
       - minio:/data
     ports:
-      - 9000
+      - 9000:9000
       - 9001:9001
     networks:
       - proxy-public
