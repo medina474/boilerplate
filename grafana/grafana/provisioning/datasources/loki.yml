@@ -16,3 +16,5 @@ datasources:
     isDefault: false
     access: proxy
     editable: true
+
+# http://localhost/grafana/api/datasources

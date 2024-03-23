@@ -23,9 +23,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-     - uptime_network
-     - whoiam_network
-     - nodered_network
+     - proxy_network
 
   whoami:
     image: traefik/whoami
@@ -35,21 +33,10 @@ services:
       traefik.http.routers.whoami.rule: ${WHOIAM_TRAEFIK_RULE}
       traefik.http.routers.whoami.entrypoints: web
     networks:
-     - whoiam_network
+     - proxy_network
 
 networks:
-  whoiam_network:
-    name: whoiam_network
+
+  proxy_network:
+    name: proxy_network
     driver: bridge
-
-  uptime_network:
-    name: uptime_network
-    external: true
-
-  nodered_network:
-    name: nodered_network
-    external: true
-
-  webdev_network:
-    name: webdev_network
-    external: true

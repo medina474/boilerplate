@@ -3,10 +3,39 @@ services:
   influxdb:
     container_name: influxdb
     image: influxdb:2-alpine
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: IUT
+      DOCKER_INFLUXDB_INIT_BUCKET: geii
+      DOCKER_INFLUXDB_INIT_RETENTION2: 2h
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
 
   chronograf:
-     container_name: chronograf
-     image:
+    container_name: chronograf
+    image: chronograf:1.9.4-alpine
+    ports:
+      - 8888:8888
+    volumes:
+      - ./data/chronograf:/var/lib/chronograf
+    depends_on:
+      - influxdb
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_USERNAME: iut
+      INFLUXDB_PASSWORD: ${PASSWORD}
 
   telegraf:
+    container_name: telegraf
     image: telegraf:${TELEGRAF_VERSION}
+    ports:
+      - 8094:8094/udp
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+      - ./metrics.out:/tmp/metrics.out

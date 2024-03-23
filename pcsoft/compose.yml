@@ -26,7 +26,7 @@ services:
     image: windev/webdev:${WEBDEV_VERSION}
     container_name: webdev
     networks:
-      - webdev_network
+      - proxy_network
       - windev-internal
     #ports:
     #  - ${WEBDEV_PORT}:80
