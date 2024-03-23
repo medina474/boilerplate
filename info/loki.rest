@@ -1,0 +1,35 @@
+ POST http://localhost:3100/loki/api/v1/push
+Content-Type: application/json
+
+{
+  "streams": [
+    {
+      "stream": {
+        "label": "value"
+      },
+      "values": [
+          [ "1703101974000000000", "Message 1" ],
+          [ "1703101974000000000", "Message 2" ]
+      ]
+    }
+  ]
+}
+
+###
+GET http://localhost:3100/loki/api/v1/query?query=sum(rate({job="varlogs"}[30m])) by (level)
+
+
+###
+GET http://localhost:3100/ready
+
+###
+GET http://localhost:3100/log_level
+
+###
+GET http://localhost:3100/metrics
+
+###
+GET http://localhost:3100//config
+
+###
+GET http://localhost:3100/services
