@@ -29,13 +29,13 @@ services:
 #      POSTGRES_USER: admin
 #      POSTGRES_PASSWORD: supermotdepasse
 
-#  mariadb:
-#    image: mariadb:11.0
-#    container_name: server_mariadb
-#    restart: no
-#    volumes:
-#      - mariadb_data:/var/lib/mysql
-#    environment:
-#      MARIADB_ROOT_PASSWORD: supermotdepasse
-#      MARIADB_USER: user
-#      MARIADB_PASSWORD: motdepasse
+   mariadb:
+   image: mariadb:11.0
+   container_name: server_mariadb
+   restart: no
+   volumes:
+     - mariadb_data:/var/lib/mysql
+   environment:
+     MARIADB_ROOT_PASSWORD: supermotdepasse
+     MARIADB_USER: user
+     MARIADB_PASSWORD: motdepasse
