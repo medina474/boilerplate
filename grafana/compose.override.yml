@@ -12,7 +12,7 @@ services:
         traefik.enable: true
         traefik.http.routers.grafana.entrypoints: web
         traefik.http.routers.grafana.rule: ${GRAFANA_TRAEFIK_RULE}
-        traefik.http.services.grafana.loadbalancer.server.port: 3000
+        traefik.http.services.grafana.loadbalancer.server.port: ${GRAFANA_PORT}
 
     prometheus:
       networks:
@@ -21,4 +21,11 @@ services:
         traefik.enable: true
         traefik.http.routers.prometheus.entrypoints: web
         traefik.http.routers.prometheus.rule: ${PROMETHEUS_TRAEFIK_RULE}
-        traefik.http.services.prometheus.loadbalancer.server.port: 9090
+        traefik.http.services.prometheus.loadbalancer.server.port: ${PROMETHEUS_PORT}
+
+    minio:
+      labels:
+        traefik.enable: true
+        traefik.http.routers.minio.entrypoints: web
+        traefik.http.routers.minio.rule: ${MINIO_TRAEFIK_RULE}
+        traefik.http.services.minio.loadbalancer.server.port: ${MINIO_PORT}
