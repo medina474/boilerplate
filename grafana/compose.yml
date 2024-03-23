@@ -57,6 +57,7 @@ services:
     ports:
       - ${PROMETHEUS_PORT}:9090
     restart: unless-stopped
+    logging: *default-logging
 
 # Loki
 # Loki est un produit de GrafanaLabs. C'est un système d'agrégation de journaux conçu
@@ -75,6 +76,7 @@ services:
       - 9095:9095
     volumes:
       - ./data/loki:/loki
+    logging: *default-logging
 
 # Minio
 # MinIO is a high-performance, S3 compatible object store. It is built for large scale AI/ML,
@@ -140,9 +142,9 @@ services:
     image: mingrammer/flog
     command:
       - --loop
-      - --format=json
+      - --format=rfc3164
       - --number=1
-      - --delay=500ms
+      - --delay=5s
       - --overwrite
       - --type=stdout
     logging: *default-logging
