@@ -1,4 +1,0 @@
-
-
-###
-GET http://localhost:3100/loki/api/v1/query?query=sum(rate({job="varlogs"}[30m])) by (level)

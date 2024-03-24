@@ -30,6 +30,8 @@ services:
       - "--metrics=true"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=web"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
       #- "--log.level=DEBUG"
     restart: unless-stopped
     environment:
