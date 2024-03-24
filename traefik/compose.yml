@@ -27,7 +27,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=proxy_network"
-
       - "--metrics=true"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entryPoint=web"
