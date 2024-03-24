@@ -1,7 +1,6 @@
 services:
   apache-logs:
     image: mingrammer/flog:0.4.3
-    container_name: apache-logs
     entrypoint:
      - flog
      - -f

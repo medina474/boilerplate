@@ -1,5 +1,6 @@
 services:
   gitea:
+    container_name: gitea
     image: gitea/${GITEA_VERSION}
     restart: always
     volumes:
