@@ -1,13 +1,13 @@
 services:
 
   mongodb:
-    image: mongo:latest
     container_name: mongodb
+    image: mongo:${MONGODB_VERSION:-7.0.7-jammy}
     volumes:
       - ./data/configdb:/data/configdb
-      - /data/db:/data/db
+      - ./data/db:/data/db
     ports:
-      - 27017:27017
+      - ${MONGODB_PORT:-27017}:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ivfGUPFKsB97y7ka9zsZ
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
