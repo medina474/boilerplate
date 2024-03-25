@@ -1,8 +1,8 @@
-name: neotech
-display_name: Neotech
+name: basic
+display_name: Basic
 version: 1.0.0
 author:
-  name: "L'agence Neotech"
+  name: "l'agence Neotech"
   email: "contact@neotech.fr"
   url: "https://www.neotech.fr"
 
