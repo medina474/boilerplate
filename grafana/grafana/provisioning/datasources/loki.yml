@@ -9,10 +9,6 @@ datasources:
     basicAuth: false
     isDefault: true
     version: 1
-    editable: false
-  - name: Prometheus
-    type: prometheus
-    url: http://prometheus:9090
-    isDefault: false
-    access: proxy
     editable: true
+
+# http://localhost/grafana/api/datasources

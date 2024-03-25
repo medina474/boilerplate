@@ -1,0 +1,15 @@
+services:
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:${PGADMIN_VERSION}
+    restart: no
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DISABLE_POSTFIX: true
+      SCRIPT_NAME: /pgadmin
+    volumes:
+      - ./data:/var/lib/pgadmin/
+    #ports:
+    #  - ${PGADMIN_PORT}:80

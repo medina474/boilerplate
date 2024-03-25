@@ -1,55 +1,49 @@
+networks:
+
+  proxy_network:
+    name: proxy_network
+    driver: bridge
+
+# docker plugin install grafana/loki-docker-driver:2.9.6 --alias loki --grant-all-permissions
+x-logging:
+  &default-logging
+    driver: loki
+    options:
+      loki-url: http://localhost:3100/loki/api/v1/push
+      loki-external-labels: job=docker,container={{.Name}},environment=development
+      loki-retries: 5
+      loki-max-backoff: 800ms
+      loki-timeout: 1s
+      keep-file: 'true'
+
 services:
 
   traefik:
     image: traefik:${TRAEFIK_VERSION}
     container_name: traefik
     command:
-      #- "--log.level=DEBUG"
+      - "--entrypoints.web.address=:80"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - "--providers.docker.network=proxy_network"
+      - "--metrics=true"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=web"
+      #- "--log.level=DEBUG"
     restart: unless-stopped
     environment:
       TZ: Europe/Paris
     ports:
       - 80:80
       #- 8080:8080 # Dashboard port
-    labels:
-      traefik.enable: true
-      traefik.http.routers.api.rule: ${DASHBOARD_TRAEFIK_RULE}
-      traefik.http.routers.api.entryPoints: web
-      traefik.http.routers.api.service: api@internal
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-     - uptime_network
-     - whoiam_network
-     - nodered_network
+     - proxy_network
+    logging:
+      << : *default-logging
 
   whoami:
     image: traefik/whoami
-    container_name: whoiam
-    labels:
-      traefik.enable: true
-      traefik.http.routers.whoami.rule: ${WHOIAM_TRAEFIK_RULE}
-      traefik.http.routers.whoami.entrypoints: web
-    networks:
-     - whoiam_network
-
-networks:
-  whoiam_network:
-    name: whoiam_network
-    driver: bridge
-
-  uptime_network:
-    name: uptime_network
-    external: true
-
-  nodered_network:
-    name: nodered_network
-    external: true
-
-  webdev_network:
-    name: webdev_network
-    external: true
+    container_name: whoami

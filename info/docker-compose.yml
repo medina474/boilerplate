@@ -1,0 +1,198 @@
+name: info
+
+x-logging:
+  &default-logging
+    driver: loki
+    options:
+      loki-url: http://localhost:3100/loki/api/v1/push
+      loki-external-labels: job=docker,container={{.Name}},environment=development
+
+networks:
+  proxy-public:
+    name: proxy-public
+  proxy-internal:
+    name: proxy-internal
+    internal: true
+  grafana-internal:
+    name: grafana-internal
+    internal: true
+  loki-internal:
+    name: loki-internal
+    internal: true
+
+configs:
+  traefik_config:
+    file: ./etc/traefik/traefik.yml
+  grafana_config:
+    file: ./etc/grafana
+  otel_config:
+    file: ./etc/otelcol-contrib/config.yaml
+  loki_config:
+    file: ./etc/loki/local-config.yaml
+  promtail_config:
+    file: ./etc/promtail/config.yaml
+  prometheus_config:
+    file: ./etc/prometheus/prometheus.yaml
+  alertmanager_config:
+    file: etc/alertmanager
+
+volumes:
+  smtp4dev:
+  grafana:
+  minio:
+  loki:
+  mongodb:
+  mongodb_config:
+  redis:
+  prometheus:
+  alertmanager:
+  jaeger:
+  opensearch:
+
+services:
+  proxy:
+    container_name: info-proxy
+    image: traefik:v3.0
+    networks:
+      - proxy-public
+      - proxy-internal
+      - grafana-internal
+    ports:
+      - 8080:8080
+      - 80:80
+    configs:
+      - source: traefik_config
+        target: /etc/traefik/traefik.yml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - grafana
+    logging:
+      << : *default-logging
+
+## GRAFANA
+
+  grafana:
+    container_name: info-grafana
+    image: grafana/grafana:10.2.2
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - grafana-internal
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    configs:
+      - source: grafana_config
+        target: /etc/grafana
+    volumes:
+      - grafana:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${PASSWORD}
+
+  minio:
+    container_name: info-minio
+    image: minio/minio
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: ${USER}
+      MINIO_ROOT_PASSWORD: ${PASSWORD}
+      MINIO_DEFAULT_BUCKETS: loki
+      MINIO_BROWSER_LOGIN_ANIMATION: off
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+      MINIO_PROMETHEUS_URL: http://prometheus:9090
+      MINIO_PROMETHEUS_JOB_ID: minio
+#      MINIO_BROWSER_REDIRECT_URL: http://localhost/minio
+    volumes:
+      - minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      - proxy-public
+      - proxy-internal
+      - loki-internal
+
+  # Create a service that only creates a default bucket.
+  # /usr/bin/mc rm -r --force minio1/loki;
+  # /usr/bin/mc policy set download minio1/loki;
+  # /usr/bin/mc admin update minio1 --yes;
+  # /usr/bin/mc mb minio1/loki;
+  # /usr/bin/mc admin prometheus generate minio1 bucket --public;
+  minio_init:
+    container_name: info-minio_init
+    image: minio/mc
+    depends_on:
+      - minio
+    networks:
+      - loki-internal
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add minio1 http://minio:9000 ${USER} ${PASSWORD};
+      /usr/bin/mc rm -r --force minio1/loki;
+      /usr/bin/mc admin info minio1;
+      exit 0;
+      "
+
+## LOKI
+## Loki est un produit de GrafanaLabs. C'est un système d'agrégation de journaux conçu
+## pour stocker et interroger les journaux (logs) de toutes vos infrastructures et applications.
+
+  loki:
+    container_name: info-loki
+    image: grafana/loki
+    depends_on:
+      - minio
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
+    networks:
+      - proxy-public
+      - grafana-internal
+      - loki-internal
+    ports:
+      - 3100:3100
+    volumes:
+      - loki:/loki
+
+## PROMETHEUS
+
+  promtail:
+    container_name: info-promtail
+    image: grafana/promtail:2.9.2
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/config.yaml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yaml
+    ports:
+      - 1514:1514
+      - 9095:9095
+    networks:
+      - proxy-public
+      - proxy-internal
+      - loki-internal
+    depends_on:
+      - prometheus
+
+  prometheus:
+    container_name: info-prometheus
+    image: prom/prometheus:v2.48.1
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+      - '--web.external-url=/prometheus/'
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yaml
+    volumes:
+      - prometheus:/prometheus
+    networks:
+      - proxy-internal
+      - grafana-internal
+      - loki-internal
+
+# https://wiki-tech.io/Donn%C3%A9es/Grafana/Loki

@@ -1,0 +1,32 @@
+### Loki
+GET http://localhost:3100/ready
+
+###
+GET http://localhost:3100/services
+
+### Loki
+GET http://localhost:3100/log_level
+
+### Loki metrics
+GET http://localhost:3100/metrics
+
+###
+GET http://localhost:3100//config
+
+###
+POST http://localhost:3100/loki/api/v1/push
+Content-Type: application/json
+
+{
+  "streams": [
+    {
+      "stream": {
+        "label": "value"
+      },
+      "values": [
+          [ "1703101974000000000", "Message 1" ],
+          [ "1703101974000000000", "Message 2" ]
+      ]
+    }
+  ]
+}

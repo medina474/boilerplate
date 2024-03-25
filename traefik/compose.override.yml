@@ -1,0 +1,16 @@
+services:
+
+  traefik:
+    labels:
+      traefik.enable: true
+      traefik.http.routers.api.rule: ${DASHBOARD_TRAEFIK_RULE}
+      traefik.http.routers.api.entryPoints: web
+      traefik.http.routers.api.service: api@internal
+
+  whoami:
+    networks:
+      - proxy_network
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.entrypoints: web
+      traefik.http.routers.whoami.rule: ${WHOAMI_TRAEFIK_RULE}

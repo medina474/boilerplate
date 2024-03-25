@@ -1,0 +1,59 @@
+networks:
+  proxy_network:
+    name: proxy_network
+    external: true
+
+services:
+
+    grafana:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.grafana.entrypoints: web
+        traefik.http.routers.grafana.rule: ${GRAFANA_TRAEFIK_RULE}
+        traefik.http.services.grafana.loadbalancer.server.port: ${GRAFANA_PORT}
+
+    prometheus:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.prometheus.entrypoints: web
+        traefik.http.routers.prometheus.rule: ${PROMETHEUS_TRAEFIK_RULE}
+        traefik.http.services.prometheus.loadbalancer.server.port: ${PROMETHEUS_PORT}
+
+    minio:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.minio.entrypoints: web
+        traefik.http.routers.minio.rule: ${MINIO_TRAEFIK_RULE}
+        traefik.http.services.minio.loadbalancer.server.port: ${MINIO_PORT}
+
+    alertmanager:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.alertmanager.entrypoints: web
+        traefik.http.routers.alertmanager.rule: ${ALERTMANAGER_TRAEFIK_RULE}
+        traefik.http.services.alertmanager.loadbalancer.server.port: ${ALERTMANAGER_PORT}
+
+    loki:
+      networks:
+        - proxy_network
+
+    minio_init:
+      networks:
+        - proxy_network
+
+    smtp4dev:
+      networks:
+        - proxy_network
+      labels:
+        traefik.enable: true
+        traefik.http.routers.smtp4dev.entrypoints: web
+        traefik.http.routers.smtp4dev.rule: ${SMTP4DEV_TRAEFIK_RULE}
+        traefik.http.services.smtp4dev.loadbalancer.server.port: 8080
