@@ -13,7 +13,7 @@ x-logging:
     driver: loki
     options:
       loki-url: http://localhost:3100/loki/api/v1/push
-      loki-external-labels: job=docker,container={{.Name}},environment=development
+      loki-external-labels: job=docker,container={{.Name}}
       loki-retries: 5
       loki-max-backoff: 800ms
       loki-timeout: 1s
@@ -28,7 +28,6 @@ services:
       resources:
         limits:
           memory: 100M
-    restart: unless-stopped
     configs:
       - source: grafana_config
         target: /etc/grafana
@@ -56,7 +55,6 @@ services:
       - ./data/prometheus:/prometheus
     ports:
       - ${PROMETHEUS_PORT}:9090
-    restart: unless-stopped
     logging: *default-logging
 
 # Loki

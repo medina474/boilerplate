@@ -14,8 +14,10 @@ GET http://localhost:3100/metrics
 GET http://localhost:3100//config
 
 ###
-GET http://localhost:3100/loki/api/v1/query?query=sum(rate({job="varlogs"}[30m])) by (level)
+GET http://localhost:3100/loki/api/v1/query?query=sum(rate({job="docker"}[30m])) by (level)
 
+###
+GET http://localhost:3100/loki/api/v1/query?query={container="prometheus"} |= `tsdb`
 
 ###
 POST http://localhost:3100/loki/api/v1/push
