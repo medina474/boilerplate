@@ -1,0 +1,41 @@
+volumes:
+  mariadb_data:
+
+networks:
+  default:
+    name: admin_net
+    external: true
+
+services:
+  mariadb:
+    image: mariadb:11.0
+    container_name: prestashop_mariadb
+    restart: no
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: prestashop
+      MARIADB_ROOT_PASSWORD: supermotdepasse
+      MARIADB_USER: user
+      MARIADB_PASSWORD: motdepasse
+
+  prestashop:
+    image:  prestashop/prestashop:1.7-7.3
+    container_name: prestashop
+    restart: no
+    environment:
+      PS_DEV_MODE: true
+      PS_DEMO_MODE: 0
+      PS_LANGUAGE: fr
+      PS_COUNTRY: FR
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: localhost:9004
+      PS_FOLDER_ADMIN: admin_1234
+      ADMIN_MAIL: e.medina@neotech.fr
+      ADMIN_PASSWD: supermotdepasse
+      DB_SERVER: prestashop_mariadb
+      DB_NAME: prestashop
+      DB_USER: user
+      DB_PASSWD: motdepasse
+    ports:
+      - 9004:80
