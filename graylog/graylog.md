@@ -65,10 +65,10 @@ cluster.name: graylog
 node.name: ${HOSTNAME}
 network.host: 0.0.0.0
 discovery.type: single-node
+plugins.security.disabled: true
 
 ??
 action.auto_create_index: false
-plugins.security.disabled: true
 indices.query.bool.max_clause_count: 32768
 ```
 
@@ -84,8 +84,28 @@ Copy
 sudo sysctl -w vm.max_map_count=262144
 sudo echo 'vm.max_map_count=262144' >> /etc/sysctl.conf
 
+sudo systemctl daemon-reload
+sudo systemctl enable opensearch.service
+sudo systemctl start opensearch.service
+sudo systemctl status opensearch
+
 ## Install Graylog
 
 wget https://packages.graylog2.org/repo/packages/graylog-5.2-repository_latest.deb
-sudo dpkg -i graylog-5.2-repository_latest.deb
-sudo apt-get update && sudo apt-get install graylog-server
+dpkg -i graylog-5.2-repository_latest.deb
+apt update && apt install graylog-server
+
+### Edit the Configuration File
+
+/etc/graylog/server/server.conf. Additionally, add password_secret and root_password_sha2 as these are mandatory and Graylog will not start without them.
+
+To be able to connect to Graylog, you should set http_bind_address to the public host name or a public IP address for the machine with which you can connect
+http_bind_address = 192.168.137.89:9000
+
+It is necessary in Graylog 5.2 to manually adjust the elasticsearch_hosts setting to include a list of comma-separated URIs to one or more valid
+elasticsearch_hosts = http://127.0.0.1:9200
+
+### Configuration
+Menu System - Inputs
+
+Add GELF UDP
