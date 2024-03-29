@@ -3,9 +3,13 @@ networks:
     name: pgadmin_network
     external: true
 
+configs:
+  postgresql_config:
+    file: ./initdb.d
+
 services:
 
-  postgres:
+  postgresql:
     container_name: postgresql
     build:
       context: .
@@ -17,7 +21,8 @@ services:
       - 5432:5432
     networks:
       - pgadmin_network
+    configs:
+      - source: postgresql_config
+        target: /docker-entrypoint-initdb.d/
     volumes:
-      - ./db/:/docker-entrypoint-initdb.d/
       - ./data/:/var/lib/postgresql/data
-
