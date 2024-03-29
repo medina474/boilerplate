@@ -3,7 +3,7 @@ services:
   traefik:
     labels:
       traefik.enable: true
-      traefik.http.routers.api.rule: ${DASHBOARD_TRAEFIK_RULE}
+      traefik.http.routers.api.rule: ${TRAEFIK_HOST_RULE}
       traefik.http.routers.api.entryPoints: web
       traefik.http.routers.api.service: api@internal
 

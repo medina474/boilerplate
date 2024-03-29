@@ -1,4 +1,5 @@
 services:
+
   database:
     image: postgis/postgis:13-master
     # Required when running on platform other than amd64, like Apple M1/M2:
@@ -14,7 +15,7 @@ services:
     image: redis:6
 
   directus:
-    image: directus/directus:10.10.4
+    image: directus/directus:${DIRECTUS_VERSION}
     ports:
       - 8055:8055
     volumes:
@@ -38,13 +39,9 @@ services:
       CACHE_STORE: "redis"
       REDIS: "redis://cache:6379"
 
-      ADMIN_EMAIL: "admin@example.com"
-      ADMIN_PASSWORD: "d1r3ctu5"
+      ADMIN_EMAIL: ${DIRECTUS_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_PASSWORD}
 
       # Make sure to set this in production
       # (see https://docs.directus.io/self-hosted/config-options#general)
       # PUBLIC_URL: "https://directus.example.com"
-
-    # Environment variables can also be defined in a file (for example `.env`):
-    # env_file:
-    #	  - .env
