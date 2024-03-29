@@ -1,5 +1,4 @@
 volumes:
-  pgadmin_data:
 #  pg_data:
 #  mariadb_data:
 
@@ -10,6 +9,17 @@ networks:
 
 services:
 
+  mariadb:
+    image: mariadb:${MARIADB_VERSION:-11.0}
+    container_name: server_mariadb
+    restart: no
+  volumes:
+    - mariadb_data:/var/lib/mysql
+  environment:
+    MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    MARIADB_USER: ${MARIADB_USER}
+    MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+
   phpmyadmin:
     image: phpmyadmin:5.2
     container_name: phpmyadmin
@@ -18,24 +28,3 @@ services:
       - 8002:80
     environment:
       PMA_ARBITRARY: 1 # Allowing you to specify any MySQL/MariaDB server on the login page.
-
-#  postgres:
-#    image: postgres:15
-#    container_name: server_postgres
-#    restart: no
-#    volumes:
-#      - pg_data:/var/lib/postgresql/data
-#    environment:
-#      POSTGRES_USER: admin
-#      POSTGRES_PASSWORD: supermotdepasse
-
-   mariadb:
-   image: mariadb:11.0
-   container_name: server_mariadb
-   restart: no
-   volumes:
-     - mariadb_data:/var/lib/mysql
-   environment:
-     MARIADB_ROOT_PASSWORD: supermotdepasse
-     MARIADB_USER: user
-     MARIADB_PASSWORD: motdepasse

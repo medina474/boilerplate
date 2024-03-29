@@ -1,0 +1,73 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cinema",
+    "description": "Application pour trouver les séances de vos films préférés",
+    "contact": {
+      "email": "emmanuel.medina@univ-lorraine.fr"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8002"
+    }
+  ],
+  "paths": {
+    "/acteur/{id}": {
+      "get": {
+        "tags": [
+          "Acteur"
+        ],
+        "description": "Détail de l'ateur",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Identifiant UUID de l'acteur",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "acteur"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Acteur": {
+        "required": [
+          "nom"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Stallone"
+          },
+          "firstname": {
+            "type": "string",
+            "example": "Sylvester"
+          },
+          "naissance": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
