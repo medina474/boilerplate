@@ -2,6 +2,7 @@ networks:
   pgadmin_network:
     name: pgadmin_network
     driver: bridge
+    internal: true
 
 configs:
   pgadmin_config:
@@ -22,3 +23,5 @@ services:
         target: /pgadmin4/servers.json
     volumes:
       - ./data/:/var/lib/pgadmin/
+    networks:
+      - pgadmin_network
