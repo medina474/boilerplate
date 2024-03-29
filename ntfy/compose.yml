@@ -10,7 +10,7 @@ services:
     command:
       - serve
     environment:
-      TZ: UTC
+      TZ: Europe/Paris
     volumes:
       - ./data/ntfy/cache:/var/cache/ntfy
     configs:

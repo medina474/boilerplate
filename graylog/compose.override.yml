@@ -1,0 +1,23 @@
+networks:
+  proxy_network:
+    name: proxy_network
+    external: true
+
+services:
+
+  mongodb:
+    networks:
+      - proxy_network
+
+  datanode:
+    networks:
+      - proxy_network
+
+  graylog:
+    networks:
+      - proxy_network
+    labels:
+      traefik.enable: true
+      traefik.http.services.graylog.loadbalancer.server.port: 9000
+      traefik.http.routers.graylog.rule: ${GRAYLOG_TRAEFIK_RULE}
+      traefik.http.routers.graylog.entrypoints: web
