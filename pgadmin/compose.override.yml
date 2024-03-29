@@ -8,6 +8,8 @@ services:
   pgadmin:
     networks:
       - proxy_network
+    environment:
+      SCRIPT_NAME: /pgadmin
     labels:
       traefik.enable: true
       traefik.http.services.pgadmin.loadbalancer.server.port: 80

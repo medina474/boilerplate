@@ -1,12 +1,12 @@
 {
   "Servers": {
       "1": {
-          "Name": "sae5",
+          "Name": "localhost",
           "Group": "Servers",
           "Host": "db",
           "Port": 5432,
           "MaintenanceDB": "postgres",
-          "Username": "supabase_admin",
+          "Username": "postgres",
           "UseSSHTunnel": 0,
           "TunnelPort": "22",
           "TunnelAuthentication": 0,

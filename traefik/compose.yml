@@ -4,7 +4,6 @@ networks:
     name: proxy_network
     driver: bridge
 
-# docker plugin install grafana/loki-docker-driver:2.9.6 --alias loki --grant-all-permissions
 x-logging:
   &default-logging
     driver: loki
@@ -38,7 +37,6 @@ services:
       TZ: Europe/Paris
     ports:
       - 80:80
-      #- 8080:8080 # Dashboard port
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
