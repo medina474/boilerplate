@@ -2,6 +2,9 @@ networks:
   pgadmin_network:
     name: pgadmin_network
     external: true
+  directus_network:
+    name: directus_network
+    external: true
 
 configs:
   postgresql_config:
@@ -16,7 +19,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB} 
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - 5432:5432
     networks:

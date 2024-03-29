@@ -10,25 +10,25 @@ networks:
 
 services:
 
-  postgresql:
-    image: cinema/postgresql
-    container_name: postgresql
-    build:
-      context: ./postgresql
-    environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - 5432:5432
-    volumes:
-      - postgresql_data:/var/lib/postgresql/data
-      - ./postgresql/initdb.d:/docker-entrypoint-initdb.d:ro
-      - ./postgresql/tmp:/tmp
-    networks:
-      - webadmin
-      - backend
+  # postgresql:
+  #   image: cinema/postgresql
+  #   container_name: postgresql
+  #   build:
+  #     context: ./postgresql
+  #   environment:
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #     - POSTGRES_DB=${POSTGRES_DB}
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - postgresql_data:/var/lib/postgresql/data
+  #     - ./postgresql/initdb.d:/docker-entrypoint-initdb.d:ro
+  #     - ./postgresql/tmp:/tmp
+  #   networks:
+  #     - webadmin
+  #     - backend
 
-  graphql:
+  postgraphile:
     image: cinema/postgraphile
     container_name: postgraphile
     build:
@@ -36,9 +36,6 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_SCHEMA=${DATABASE_SCHEMA}
-    depends_on:
-      postgresql:
-        condition: service_healthy
     ports:
       - 8003:5433
     networks:
