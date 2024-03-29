@@ -1,0 +1,3 @@
+.env
+postgresql/tmp
+postgresql/initdb.d

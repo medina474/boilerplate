@@ -1,0 +1,16 @@
+OPTIONS  http://localhost:8003/graphql
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+###
+POST http://localhost:8003/graphql
+Content-Type: application/graphql
+
+query Acteurs {
+  allActeurs(first: 10) {
+    nodes {
+      name
+      photo
+    }
+  }
+}

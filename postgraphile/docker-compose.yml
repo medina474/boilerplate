@@ -1,0 +1,64 @@
+volumes:
+  postgresql_data:
+
+networks:
+  backend:
+    driver: bridge
+  webadmin:
+    name: webadmin_net
+    external: true
+
+services:
+
+  postgresql:
+    image: cinema/postgresql
+    container_name: postgresql
+    build:
+      context: ./postgresql
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d ${POSTGRES_DB}'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./postgresql/initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./postgresql/tmp:/tmp
+    networks:
+      - webadmin
+      - backend
+
+  graphql:
+    image: cinema/postgraphile
+    container_name: postgraphile
+    build:
+      context: ./postgraphile
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_SCHEMA=${DATABASE_SCHEMA}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    ports:
+      - 8003:5433
+    networks:
+      - backend
+    command:
+      [
+        "--connection",
+        "${DATABASE_URL}",
+        "--port", "5433",
+        "--schema", "public,${DATABASE_SCHEMA}",
+        "--enhance-graphiql",
+        "--cors",
+        "--allow-explain",
+        "--dynamic-json",
+        "--append-plugins",
+        "postgraphile-plugin-connection-filter,postgraphile-plugin-fulltext-filter,@graphile/postgis,postgraphile-plugin-connection-filter-postgis"
+      ]
