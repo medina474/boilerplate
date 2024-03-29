@@ -1,3 +1,8 @@
+networks:
+  proxy_network:
+    name: proxy_network
+    external: true
+
 services:
 
   nodered:
@@ -8,8 +13,3 @@ services:
       traefik.http.services.nodered.loadbalancer.server.port: 1880
       traefik.http.routers.nodered.rule: ${NODERED_TRAEFIK_RULE}
       traefik.http.routers.nodered.entrypoints: web
-
-networks:
-  proxy_network:
-    name: proxy_network
-    external: true
