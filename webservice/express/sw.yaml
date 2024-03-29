@@ -1,0 +1,9 @@
+openapi: 3.0.3
+info:
+  title: Cinema
+  description: 'Application pour trouver des séances de vos films préférés'
+  contact:
+    email: emmanuel.medina@univ-lorraine.fr
+  version: 1.0.0
+servers:
+- url: http://localhost:8002

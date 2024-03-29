@@ -1,0 +1,19 @@
+{
+  "name": "cinema.rest.server",
+  "version": "1.0.0",
+  "author": "Emmanuel Medina",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:cinema3/rest-server.git"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "pg-promise": "^11.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.0",
+    "validator": "^13.1.17",
+    "yamljs": "^0.3.0"
+  }
+}
