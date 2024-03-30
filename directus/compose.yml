@@ -24,7 +24,7 @@ services:
     environment:
       KEY: ${DIRECTUS_KEY}
       SECRET: ${DIRECTUS_SECRET}
-      PUBLIC_URL: https://directus.docker.local/
+      PUBLIC_URL: https://directus.docker.org/
       PORT: ${DIRECTUS_PORT}
 
       DB_CLIENT: ${DIRECTUS_DB_CLIENT}

@@ -16,7 +16,7 @@ services:
       - 25:25
       - 143:143
     environment:
-      - ServerOptions__HostName=boilerplate.docker.local
+      - ServerOptions__HostName=boilerplate.docker.org
       - ServerOptions__BasePath=/smtp4dev
     labels:
       traefik.enable: true

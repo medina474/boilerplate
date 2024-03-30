@@ -1,0 +1,4 @@
+GET http://boilerplate.docker.org/ping
+
+###
+GET http://boilerplate.docker.org/metrics
