@@ -1,13 +1,13 @@
 networks:
-  proxy_network:
-    name: proxy_network
+  proxy_internal:
+    name: proxy_internal
     external: true
 
 services:
 
   pgadmin:
     networks:
-      - proxy_network
+      - proxy_internal
     environment:
       SCRIPT_NAME: /pgadmin
     labels:

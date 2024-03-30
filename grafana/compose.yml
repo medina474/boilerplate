@@ -141,7 +141,7 @@ services:
     container_name: smtp4dev
     image: rnwood/smtp4dev:${SMTP4DEV_VERSION}
     networks:
-      - proxy_network
+      - proxy_internal
     volumes:
       - ./data/smtp4dev:/smtp4dev
     ports:

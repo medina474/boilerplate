@@ -1,21 +1,21 @@
 networks:
-  proxy_network:
-    name: proxy_network
+  proxy_internal:
+    name: proxy_internal
     external: true
 
 services:
 
   mongodb:
     networks:
-      - proxy_network
+      - proxy_internal
 
   datanode:
     networks:
-      - proxy_network
+      - proxy_internal
 
   graylog:
     networks:
-      - proxy_network
+      - proxy_internal
     labels:
       traefik.enable: true
       traefik.http.services.graylog.loadbalancer.server.port: 9000

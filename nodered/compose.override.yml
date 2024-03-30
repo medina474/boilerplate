@@ -1,13 +1,13 @@
 networks:
-  proxy_network:
-    name: proxy_network
+  proxy_internal:
+    name: proxy_internal
     external: true
 
 services:
 
   nodered:
     networks:
-      - proxy_network
+      - proxy_internal
     labels:
       traefik.enable: true
       traefik.http.services.nodered.loadbalancer.server.port: 1880

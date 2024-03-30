@@ -1,13 +1,13 @@
 networks:
-  proxy_network:
-    name: proxy_network
+  proxy_internal:
+    name: proxy_internal
     external: true
 
 services:
 
     grafana:
       networks:
-        - proxy_network
+        - proxy_internal
       labels:
         traefik.enable: true
         traefik.http.routers.grafana.entrypoints: web
@@ -16,7 +16,7 @@ services:
 
     prometheus:
       networks:
-        - proxy_network
+        - proxy_internal
       labels:
         traefik.enable: true
         traefik.http.routers.prometheus.entrypoints: web
@@ -25,7 +25,7 @@ services:
 
     minio:
       networks:
-        - proxy_network
+        - proxy_internal
       labels:
         traefik.enable: true
         traefik.http.routers.minio.entrypoints: web
@@ -34,7 +34,7 @@ services:
 
     alertmanager:
       networks:
-        - proxy_network
+        - proxy_internal
       labels:
         traefik.enable: true
         traefik.http.routers.alertmanager.entrypoints: web
@@ -43,15 +43,15 @@ services:
 
     loki:
       networks:
-        - proxy_network
+        - proxy_internal
 
     minio_init:
       networks:
-        - proxy_network
+        - proxy_internal
 
     smtp4dev:
       networks:
-        - proxy_network
+        - proxy_internal
       labels:
         traefik.enable: true
         traefik.http.routers.smtp4dev.entrypoints: web
