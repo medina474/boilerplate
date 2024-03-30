@@ -8,5 +8,5 @@ receivers:
   - name: 'mail'
     email_configs:
       - smarthost: 'smtp:25'
-        from: 'alert@univ-lorraine.fr'
-        to: 'emmanuel.medina@univ-lorraine.fr'
+        from: 'alert@docker.org'
+        to: 'boilerplate@docker.org'

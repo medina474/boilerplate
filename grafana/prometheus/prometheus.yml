@@ -46,6 +46,13 @@ scrape_configs:
       - targets:
           - 'loki:3100'
 
+  - job_name: dragonfly
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+          - 'dragonfly:6379'
+
   #- job_name: "node"
 
     # metrics_path defaults to '/metrics'

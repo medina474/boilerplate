@@ -35,6 +35,8 @@ services:
       - prometheus
     volumes:
       - ./data/grafana:/var/lib/grafana
+    networks:
+      - proxy_internal
     #ports:
     #  - ${GRAFANA_PORT}:3000
     environment:
@@ -53,6 +55,8 @@ services:
         target: /etc/prometheus/prometheus.yml
     volumes:
       - ./data/prometheus:/prometheus
+    networks:
+      - proxy_internal
     ports:
       - ${PROMETHEUS_PORT}:9090
     logging: *default-logging
