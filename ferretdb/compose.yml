@@ -1,0 +1,19 @@
+networks:
+  ferretdb_host:
+    name: ferretdb_host
+    driver: bridge
+  postgresql_internal:
+    external: true
+
+
+services:
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb
+    container_name: ferretdb
+    ports:
+      - 27017:27017
+    networks:
+      - ferretdb_host
+      - postgresql_internal
+    environment:
+      - FERRETDB_POSTGRESQL_URL=postgres://postgresql:5432/ferretdb

@@ -6,9 +6,6 @@ networks:
   postgresql_internal:
     name: postgresql_internal
     internal: true
-  pgadmin_internal:
-    name: pgadmin_internal
-    external: true
 
 configs:
   postgresql_config:
@@ -28,7 +25,6 @@ services:
       - 5432:5432
     networks:
       - postgresql_internal
-      - pgadmin_internal
       - host_network
     configs:
       - source: postgresql_config

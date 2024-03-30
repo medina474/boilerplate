@@ -14,8 +14,6 @@ services:
   directus:
     container_name: directus
     image: directus/directus:${DIRECTUS_VERSION}
-    ports:
-      - 8055:${DIRECTUS_PORT}
     networks:
       - dragonfly_internal
       - postgresql_internal

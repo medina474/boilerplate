@@ -1,8 +1,10 @@
 networks:
-  pgadmin_internal:
-    name: pgadmin_internal
-    driver: bridge
-    internal: true
+  postgresql_internal:
+    name: postgresql_internal
+    external: true
+  proxy_internal:
+    name: proxy_internal
+    external: true
 
 configs:
   pgadmin_config:
@@ -25,4 +27,4 @@ services:
       - ./data/:/var/lib/pgadmin/
     networks:
       - proxy_internal
-      - pgadmin_internal
+      - postgresql_internal
