@@ -12,7 +12,6 @@ services:
     volumes:
       - ./data/smtp4dev:/smtp4dev
     ports:
-      - ${SMTP4DEV_PORT:-8080}:8080
       - 25:25
       - 143:143
     environment:
