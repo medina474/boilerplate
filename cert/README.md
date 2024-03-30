@@ -42,7 +42,7 @@ C = FR                              # Country
 [v3_ca]
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true
+basicConstraints = critical, CA:true, pathlen:0
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 ```
 
@@ -63,16 +63,23 @@ openssl req -x509 -utf8 -newkey rsa:4096 -keyout master.key -config master.cnf
 
 La commande req est utilisée pour traiter les demandes de création de certificats au format PKCS # 10. Nous l’utilisons ici pour créer un certificat auto-signé à utiliser comme autorité de certification racine.
 
--x509 : Norme spécifiant le format du certificat. Nous l’utilisons ici pour générer un certificat auto-signé au lieu d'une demande de certificat.
--utf8 : Les valeurs seront encodées en UTF8, sinon elles le seront en ascii et aucun accent ne sera affiché correctement.
--newkey rsa:4096 : Génère la clé privée RSA (de longueur 4096 bits) en même temps que le certificat.
--keyout : Nom du fichier pour écrire la clé privée nouvellement créée (ici master.key).
--config : fichier de configuration à utiliser (ici master.cnf)
--extensions : rubrique du fichier de configuration à prendre en compte lors de la création du certificat. (ici les extensions v3_ca)
--days : Nombre de jours de validité du certificat. Nous définissons ici une validité de 5 ans.
--out : Nom du fichier pour écrire le certificat.
+**x509** : Norme spécifiant le format du certificat. Nous l’utilisons ici pour générer un certificat auto-signé au lieu d'une demande de certificat.
 
-## 3. Installer le certificat racine pour chaque navigateur (Firefox, Chrome et Edge)
+**utf8** : Les valeurs seront encodées en UTF8, sinon elles le seront en ascii et aucun accent ne sera affiché correctement.
+
+**newkey rsa:4096** : Génère la clé privée RSA (de longueur 4096 bits) en même temps que le certificat.
+
+**keyout** : Nom du fichier pour écrire la clé privée nouvellement créée (ici master.key).
+
+**config** : fichier de configuration à utiliser (ici master.cnf)
+
+**extensions** : rubrique du fichier de configuration à prendre en compte lors de la création du certificat. (ici les extensions v3_ca)
+
+**days** : Nombre de jours de validité du certificat. Nous définissons ici une validité de 5 ans.
+
+**out** : Nom du fichier pour écrire le certificat.
+
+### 3. Installer le certificat racine dans chaque navigateur
 
 Firefox – Options – Vie privée et sécurité – Afficher les certificats – Importer le fichier master.crt – Choisir le paramètre de confiance : Ce certificat peut identifier des sites web.
 
@@ -80,19 +87,22 @@ Chrome utilise le magasin de Windows qui est utilisé aussi par Edge et toutes l
 
 Chrome – Paramètres – Rechercher : certificats – Gérer les certificats – Choisir l’onglet Autorités de certification racines de confiance – Importer … - Choisir le magasin par défaut.
 
-Création du certificat pour localhost
+## Création du certificat pour un domaine particulier
 
-Générer une demande de certificat et la clé privée associée
+### 1. Générer une demande de certificat et la clé privée associée
 
-openssl req -new -utf8 -newkey rsa:1024 -nodes -keyout localhost.key
--config localhost.cnf –out localhost.csr -days 180
+```shell-session
+openssl req -new -utf8 -newkey rsa:1024 -nodes -keyout boilerplate.key
+-config boilerplate.cnf –out boilerplate.csr -days 180
+```
 
 -new : générer une demande de certificat
 -nodes : ne pas chiffrer la clé (no DES)
 -out : Nom du fichier pour écrire la demande de certificat.
 
-Fichier de configuration localhost.cnf. (Utilisation de caractère non ascii)
+Fichier de configuration boilerplate.cnf. (Utilisation de caractère non ascii)
 
+```
 [req]
 prompt = no
 distinguished_name = dn
@@ -104,8 +114,9 @@ O = 大阪大学                                # Ōsaka Daigaku (Université d'
 OU = Факультет радиотехники и кибернетики  # Département d'Ingénierie Radio et Cybernétique
 L =  الإسكندرية                             # al-ʾIskandariyya (Alexandrie)
 C = IT                                     # Pays (Country)
+```
 
-Accepter et signer la demande de certificat
+### 2. Accepter et signer la demande de certificat
 
 Fichier de configuration extensions.cnf qui va contenir les directives pour l'extension SAN (Subject Alternative Name)
 
@@ -117,22 +128,27 @@ subjectAltName = @alt_names
 
 [ alt_names ]
 DNS.1 = localhost
-IP.1 = 192.168.1.18
+DNS.2 = boilerplate.docker.local
+IP.1 = 192.168.1.19
 ```
 
 ```
-openssl x509 -req -in localhost.csr ^
-      -CA master.crt -CAkey master.key -CAcreateserial ^
-      -extensions v3_req ^
-
-      -extfile extensions.cnf ^
-      -out localhost.crt
+openssl x509 -req -in boilerplate.csr ^
+  -CA master.crt -CAkey master.key -CAcreateserial ^
+  -extensions v3_req ^
+  -extfile extensions.cnf ^
+  -out boilerplate.crt
 ```
 
 La commande x509 est utilisée pour générer un certificat au format PKCS # 10.
 
--CA : certificat de l'autorité qui signe ce certificat
--CAkey : clé privée de certificat d'autorité
--CAcreateserial : fichier qui va contenir un identifiant de sérialisation, la prochaine fois utiliser l'option
--CAserial qui va incrémenter ce numéro de série.
--extfile : fichier qui va contenir la configuration requise pour l'extension
+
+CA : certificat de l'autorité qui signe ce certificat
+
+CAkey : clé privée de certificat d'autorité
+
+CAcreateserial : fichier qui va contenir un identifiant de sérialisation, la prochaine fois utiliser l'option
+
+CAserial qui va incrémenter ce numéro de série.
+
+extfile : fichier qui va contenir la configuration requise pour l'extension

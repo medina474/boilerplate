@@ -1,0 +1,4 @@
+tls:
+  certificates:
+    - certFile: /etc/certs/boilerplate.crt
+      keyFile: /etc/certs/boilerplate.key

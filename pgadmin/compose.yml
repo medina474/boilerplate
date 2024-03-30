@@ -1,6 +1,6 @@
 networks:
-  pgadmin_network:
-    name: pgadmin_network
+  pgadmin_internal:
+    name: pgadmin_internal
     driver: bridge
     internal: true
 
@@ -24,4 +24,5 @@ services:
     volumes:
       - ./data/:/var/lib/pgadmin/
     networks:
-      - pgadmin_network
+      - proxy_internal
+      - pgadmin_internal
