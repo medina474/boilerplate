@@ -1,39 +1,44 @@
 networks:
-  directus_network:
-    name: directus_network
-    driver: bridge
-    internal: true
+  dragonfly_internal:
+    name: dragonfly_internal
+    external: true
+  postgresql_internal:
+    name: postgresql_internal
+    external: true
+  proxy_internal:
+    name: proxy_internal
+    external: true
 
 services:
-
-  cache:
-    container_name: redis
-    image: redis:6
 
   directus:
     container_name: directus
     image: directus/directus:${DIRECTUS_VERSION}
     ports:
-      - 8055:8055
+      - 8055:${DIRECTUS_PORT}
+    networks:
+      - dragonfly_internal
+      - postgresql_internal
+      - proxy_internal
     volumes:
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions
-    depends_on:
-      - cache
     environment:
-      KEY: "255d861b-5ea1-5996-9aa3-922530ec40b1"
-      SECRET: "6116487b-cda1-52c2-b5b5-c8022c45e263"
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      PUBLIC_URL: https://boilerplate.docker.local/directus/
+      PORT: ${DIRECTUS_PORT}
 
-      DB_CLIENT: "pg"
-      DB_HOST: "postgresql"
-      DB_PORT: 5432
-      DB_DATABASE: "postgres"
-      DB_USER: "postgres"
-      DB_PASSWORD: "supermotdepasse"
+      DB_CLIENT: ${DIRECTUS_DB_CLIENT}
+      DB_HOST: ${DIRECTUS_DB_HOST}
+      DB_PORT: ${DIRECTUS_DB_PORT}
+      DB_DATABASE: ${DIRECTUS_DB_DATABASE}
+      DB_USER: ${DIRECTUS_DB_USER}
+      DB_PASSWORD: ${DIRECTUS_DB_PASSWORD}
 
-      CACHE_ENABLED: "true"
+      CACHE_ENABLED: true
       CACHE_STORE: redis
-      REDIS: "redis://cache:6379"
+      REDIS: redis://dragonfly:6379
 
       ADMIN_EMAIL: ${DIRECTUS_EMAIL}
       ADMIN_PASSWORD: ${DIRECTUS_PASSWORD}

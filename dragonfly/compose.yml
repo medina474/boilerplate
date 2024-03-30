@@ -1,3 +1,10 @@
+networks:
+  dragonfly_internal:
+    name: dragonfly_internal
+    internal: true
+  dragonfly_network:
+    name: dragonfly_network
+
 services:
 
   dragonfly:
@@ -5,3 +12,10 @@ services:
     container_name: dragonfly
     ulimits:
       memlock: -1
+    ports:
+      - ${DRAGONFLY_PORT}:6379
+    networks:
+      - dragonfly_internal
+      - dragonfly_network
+    volumes:
+      - ./data/:/data/

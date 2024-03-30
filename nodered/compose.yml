@@ -6,6 +6,6 @@ services:
     environment:
       TZ: Europe/Paris
     ports:
-      - 1880:1880
+      - ${NODERED_PORT}:1880
     volumes:
       - ./data:/data

@@ -2,7 +2,7 @@
   "Servers": {
       "1": {
           "Name": "localhost",
-          "Group": "Boilerplate",
+          "Group": "Servers",
           "Host": "postgresql",
           "Port": 5432,
           "MaintenanceDB": "postgres",

@@ -1,0 +1,2 @@
+### Prometheus metrics
+GET http://localhost:6379/metrics
