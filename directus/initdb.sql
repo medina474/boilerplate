@@ -1,4 +1,5 @@
-create schema if not exists directus;
-alter schema directus owner to pg_database_owner;
+create database directus;
+\c directus;
+create extension if not exists postgis;
 
-create extension if not exists postgis schema directus;
+-- alter schema directus owner to pg_database_owner;

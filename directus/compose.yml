@@ -26,7 +26,7 @@ services:
     environment:
       KEY: ${DIRECTUS_KEY}
       SECRET: ${DIRECTUS_SECRET}
-      PUBLIC_URL: https://boilerplate.docker.local/directus/
+      PUBLIC_URL: https://directus.docker.local/
       PORT: ${DIRECTUS_PORT}
 
       DB_CLIENT: ${DIRECTUS_DB_CLIENT}
