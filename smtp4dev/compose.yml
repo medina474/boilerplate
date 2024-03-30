@@ -1,0 +1,26 @@
+networks:
+  proxy_internal:
+    name: proxy_internal
+    external: true
+
+services:
+  smtp4dev:
+    container_name: smtp4dev
+    image: rnwood/smtp4dev:${SMTP4DEV_VERSION:-linux-amd64-3.3.4}
+    networks:
+      - proxy_internal
+    volumes:
+      - ./data/smtp4dev:/smtp4dev
+    ports:
+      - ${SMTP4DEV_PORT:-8080}:8080
+      - 25:25
+      - 143:143
+    environment:
+      - ServerOptions__HostName=boilerplate.docker.local
+      - ServerOptions__BasePath=/smtp4dev
+    labels:
+      traefik.enable: true
+      traefik.http.routers.smtp4dev.entrypoints: websecure
+      traefik.http.routers.smtp4dev.tls: true
+      traefik.http.routers.smtp4dev.rule: ${SMTP4DEV_TRAEFIK_RULE}
+      traefik.http.services.smtp4dev.loadbalancer.server.port: 8080

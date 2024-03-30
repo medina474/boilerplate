@@ -48,12 +48,3 @@ services:
     minio_init:
       networks:
         - proxy_internal
-
-    smtp4dev:
-      networks:
-        - proxy_internal
-      labels:
-        traefik.enable: true
-        traefik.http.routers.smtp4dev.entrypoints: web
-        traefik.http.routers.smtp4dev.rule: ${SMTP4DEV_TRAEFIK_RULE}
-        traefik.http.services.smtp4dev.loadbalancer.server.port: 8080
