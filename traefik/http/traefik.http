@@ -2,3 +2,6 @@ GET http://boilerplate.docker.org/ping
 
 ###
 GET http://boilerplate.docker.org/metrics
+
+###
+GET https://boilerplate.docker.org/whoami

@@ -33,6 +33,9 @@ services:
       - "--entryPoints.websecure.address=:443"
       - "--api.insecure=true"
 
+      - "--ping=true"
+      - "--ping.entryPoint=web"
+
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=proxy_internal"
@@ -43,7 +46,7 @@ services:
       - "--metrics.prometheus.entryPoint=web"
       - "--metrics.prometheus.addEntryPointsLabels=true"
       - "--metrics.prometheus.addServicesLabels=true"
-      #- "--log.level=DEBUG"
+      - "--log.level=DEBUG"
     restart: unless-stopped
     environment:
       TZ: Europe/Paris
@@ -75,6 +78,8 @@ services:
       - proxy_internal
     ports:
       - 8081:80
+    depends_on:
+      - traefik
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.entrypoints: websecure
