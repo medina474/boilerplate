@@ -24,18 +24,20 @@ services:
     container_name: prestashop
     restart: no
     environment:
-      PS_DEV_MODE: true
-      PS_DEMO_MODE: 0
-      PS_LANGUAGE: fr
-      PS_COUNTRY: FR
-      PS_INSTALL_AUTO: 1
-      PS_DOMAIN: localhost:9004
-      PS_FOLDER_ADMIN: admin_1234
-      ADMIN_MAIL: e.medina@neotech.fr
-      ADMIN_PASSWD: supermotdepasse
-      DB_SERVER: prestashop_mariadb
-      DB_NAME: prestashop
-      DB_USER: user
-      DB_PASSWD: motdepasse
+      PS_DEV_MODE: ${PRESTASHOP_DEV_MODE}
+      PS_DEMO_MODE: ${PRESTASHOP_DEMO_MODE}
+      PS_LANGUAGE: ${PRESTASHOP_LANGUAGE:-fr}
+      PS_COUNTRY: ${PRESTASHOP_COUNTRY:-FR}
+      PS_INSTALL_AUTO: ${PRESTASHOP_INSTALL_AUTO}
+      PS_DOMAIN: ${PRESTASHOP_DOMAIN}
+      PS_FOLDER_ADMIN: ${PRESTASHOP_FOLDER_ADMIN}
+
+      ADMIN_MAIL: ${PRESTASHOP_ADMIN_MAIL}
+      ADMIN_PASSWD: ${PRESTASHOP_ADMIN_PASSWD}
+
+      DB_SERVER: ${PRESTASHOP_DB_SERVER}
+      DB_NAME: ${PRESTASHOP_DB_NAME}
+      DB_USER: ${PRESTASHOP_DB_USER}
+      DB_PASSWD: ${PRESTASHOP_DB_PASSWD}
     ports:
       - 9004:80
