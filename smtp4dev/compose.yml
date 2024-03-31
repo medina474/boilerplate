@@ -10,7 +10,7 @@ services:
     networks:
       - proxy_internal
     volumes:
-      - ./data/smtp4dev:/smtp4dev
+      - ./data:/smtp4dev
     ports:
       - 25:25
       - 143:143
