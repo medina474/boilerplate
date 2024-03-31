@@ -1,19 +1,16 @@
 networks:
   dragonfly_internal:
-    name: dragonfly_internal
     external: true
   postgresql_internal:
-    name: postgresql_internal
     external: true
   proxy_internal:
-    name: proxy_internal
     external: true
 
 services:
 
   directus:
     container_name: directus
-    image: directus/directus:${DIRECTUS_VERSION}
+    image: directus/directus:${DIRECTUS_VERSION:-10.10}
     networks:
       - dragonfly_internal
       - postgresql_internal

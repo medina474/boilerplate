@@ -2,8 +2,8 @@ networks:
   dragonfly_internal:
     name: dragonfly_internal
     internal: true
-  dragonfly_network:
-    name: dragonfly_network
+  host_bridge:
+    external: true
 
 services:
 
@@ -13,9 +13,9 @@ services:
     ulimits:
       memlock: -1
     ports:
-      - ${DRAGONFLY_PORT}:6379
+      - ${DRAGONFLY_PORT:-6379}:6379
     networks:
       - dragonfly_internal
-      - dragonfly_network
+      - host_bridge
     volumes:
       - ./data/:/data/

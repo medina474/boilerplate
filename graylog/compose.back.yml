@@ -1,12 +1,5 @@
 services:
 
-  opensearch:
-    image: opensearchproject/opensearch:latest
-    container_name: opensearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-
   graylog:
     image: graylog/graylog:5.0.1
     container_name: graylog
