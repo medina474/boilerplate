@@ -15,3 +15,12 @@ https://github.com/cniackz/loki?ref=blog.min.io
 
 ```yaml
 ```
+
+PostgreSQL
+
+Database user permissions (Important!)
+The database user you specify when you add the data source should only be granted SELECT permissions on the specified database and tables you want to query. Grafana does not validate that the query is safe. The query could include any SQL statement. For example, statements like DELETE FROM user; and DROP TABLE user; would be executed. To protect against this we highly recommend you create a specific PostgreSQL user with restricted permissions.
+
+ CREATE USER grafana WITH PASSWORD 'supermotdepasse';
+ GRANT USAGE ON SCHEMA public TO grafana;
+ GRANT SELECT ON public.table TO grafana;

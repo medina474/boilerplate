@@ -1,0 +1,58 @@
+services:
+# Minio
+# MinIO is a high-performance, S3 compatible object store. It is built for large scale AI/ML,
+# data lake and database workloads. It is software-defined and runs on any cloud or on-premises infrastructure.
+
+  minio:
+    container_name: minio
+    image: minio/minio
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_DEFAULT_BUCKETS: loki
+      MINIO_BROWSER_LOGIN_ANIMATION: off
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+      MINIO_PROMETHEUS_URL: http://prometheus:9090
+      MINIO_PROMETHEUS_JOB_ID: minio
+    volumes:
+      - ./data/minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      - proxy_internal
+    labels:
+      traefik.enable: true
+      traefik.http.routers.minio.entrypoints: websecure
+      traefik.http.routers.minio.tls: true
+      traefik.http.routers.minio.rule: ${MINIO_TRAEFIK_RULE}
+      traefik.http.services.minio.loadbalancer.server.port: ${MINIO_PORT}
+
+    #healthcheck:
+    #  test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+    #  interval: 15s
+    #  timeout: 20s
+    #  retries: 5
+    logging: *default-logging
+
+  # Create a service that only creates a default bucket.
+  # /usr/bin/mc policy set download minio1/loki;
+  # /usr/bin/mc admin update minio1 --yes;
+  minio_init:
+    container_name: minio_init
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add minio1 http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc rm -r --force minio1/loki;
+      /usr/bin/mc mb minio1/loki;
+      /usr/bin/mc policy set public minio1/loki;
+      /usr/bin/mc admin prometheus generate minio1 bucket --public;
+      /usr/bin/mc admin info minio1;
+      exit 0;
+      "
+    networks:
+      - proxy_internal

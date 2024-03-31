@@ -5,7 +5,7 @@ datasources:
     type: prometheus
     url: http://prometheus:9090/prometheus
     orgId: 1
-    isDefault: false
+    isDefault: true
     access: proxy
     editable: true
     jsonData:

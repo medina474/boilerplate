@@ -1,8 +1,6 @@
 networks:
-  host_network:
-    name: host_network
-    driver:
-      bridge
+  host_bridge:
+    external: true
   postgresql_internal:
     name: postgresql_internal
     internal: true
@@ -26,7 +24,7 @@ services:
       - 5432:5432
     networks:
       - postgresql_internal
-      - host_network
+      - host_bridge
     configs:
       - source: postgresql_config
         target: /docker-entrypoint-initdb.d/

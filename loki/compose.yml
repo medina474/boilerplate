@@ -1,0 +1,25 @@
+configs:
+  loki_config:
+    file: ./local-config.yml
+
+services:
+# Loki
+# Loki est un produit de GrafanaLabs. C'est un système d'agrégation de journaux conçu
+# pour stocker et interroger les journaux (logs) de toutes vos infrastructures et applications.
+  loki:
+    container_name: loki
+    image: grafana/loki:${LOKI_VERSION}
+    command: -config.file=/etc/loki/local-config.yaml
+    depends_on:
+      - minio
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
+    ports:
+      - ${LOKI_PORT}:3100
+      - 9095:9095
+    volumes:
+      - ./data/loki:/loki
+    networks:
+      - proxy_internal
+    logging: *default-logging

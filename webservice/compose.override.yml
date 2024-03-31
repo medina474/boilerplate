@@ -1,0 +1,14 @@
+services:
+## FAKE
+
+  fakelog:
+    container_name: fake_logs
+    image: mingrammer/flog
+    command:
+      - --loop
+      - --format=rfc3164
+      - --number=1
+      - --delay=5s
+      - --overwrite
+      - --type=stdout
+    logging: *default-logging
