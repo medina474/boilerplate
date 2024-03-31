@@ -1,3 +1,11 @@
+networks:
+  proxy_internal:
+    external: true
+
+configs:
+  nodered_settings:
+    file: ./settings.js
+
 services:
 
   nodered:
@@ -5,7 +13,16 @@ services:
     container_name: nodered
     environment:
       TZ: Europe/Paris
-    ports:
-      - ${NODERED_PORT}:1880
+    configs:
+      - source: nodered_settings
+        target: /data/settings.js
     volumes:
       - ./data:/data
+    networks:
+      - proxy_internal
+    labels:
+      traefik.enable: true
+      traefik.http.routers.nodered.entrypoints: websecure
+      traefik.http.routers.nodered.tls: true
+      traefik.http.routers.nodered.rule: ${NODERED_TRAEFIK_RULE}
+      traefik.http.services.nodered.loadbalancer.server.port: ${NODERED_PORT}
