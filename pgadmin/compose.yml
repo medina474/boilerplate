@@ -1,9 +1,7 @@
 networks:
   postgresql_internal:
-    name: postgresql_internal
     external: true
   proxy_internal:
-    name: proxy_internal
     external: true
 
 configs:
