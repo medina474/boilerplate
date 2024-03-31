@@ -16,7 +16,7 @@ services:
       MINIO_DEFAULT_BUCKETS: loki
       MINIO_BROWSER_LOGIN_ANIMATION: off
       MINIO_PROMETHEUS_AUTH_TYPE: public
-      MINIO_PROMETHEUS_URL: http://prometheus:9090
+      MINIO_PROMETHEUS_URL: http://prometheus:9090/prometheus
       MINIO_PROMETHEUS_JOB_ID: minio
     volumes:
       - ./data:/data

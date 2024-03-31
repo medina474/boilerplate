@@ -10,7 +10,7 @@ configs:
   grafana_config:
     file: ./grafana
   prometheus_config:
-    file: prometheus/prometheus.yml
+    file: ./prometheus.yml
   alertmanager_config:
     file: ./alertmanager
 

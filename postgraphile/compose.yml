@@ -8,7 +8,7 @@ networks:
 services:
 
   postgraphile:
-    image: cinema/postgraphile:2024.03
+    image: boilerplate/postgraphile:2024.03
     container_name: postgraphile
     build:
       context: ./postgraphile

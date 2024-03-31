@@ -1,7 +1,5 @@
 FROM postgres:16-bullseye
 
-LABEL version="2024.03.29"
-
 ENV POSTGIS_MAJOR 3
 ENV POSTGIS_VERSION 3.4.2+dfsg-1.pgdg110+1
 

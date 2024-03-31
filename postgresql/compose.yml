@@ -12,7 +12,7 @@ configs:
 services:
 
   postgresql:
-    image: postgresql:2024.03
+    image: boilerplate/postgresql:2024.03
     container_name: postgresql
     build:
       context: .
