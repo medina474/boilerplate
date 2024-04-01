@@ -4,6 +4,8 @@ networks:
     driver: bridge
   postgresql_internal:
     external: true
+  proxy_internal:
+    external: true
 
 services:
 
@@ -13,19 +15,21 @@ services:
     build:
       context: ./postgraphile
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - DATABASE_SCHEMA=${DATABASE_SCHEMA}
-    ports:
-      - 8003:5433
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT:-5432}
+      - PGDATABASE=${PGDATABASE}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
     networks:
       - postgresql_internal
       - postgraphile_host
+      - proxy_internal
     command:
       [
-        "--connection",
-        "${DATABASE_URL}",
-        "--port", "5433",
-        "--schema", "public,${DATABASE_SCHEMA}",
+        "--port", "${POSTGRAPHILE_PORT:-5000}",
+        "--graphql", "/postgraphile/graphql",
+        "--graphiql", "/postgraphile/graphiql",
+        "--schema", "${POSTGRAPHILE_SCHEMA}",
         "--enhance-graphiql",
         "--cors",
         "--allow-explain",
@@ -33,3 +37,9 @@ services:
         "--append-plugins",
         "postgraphile-plugin-connection-filter,postgraphile-plugin-fulltext-filter,@graphile/postgis,postgraphile-plugin-connection-filter-postgis"
       ]
+    labels:
+      traefik.enable: true
+      traefik.http.routers.postgraphile.entrypoints: websecure
+      traefik.http.routers.postgraphile.tls: true
+      traefik.http.routers.postgraphile.rule: ${POSTGRAPHILE_TRAEFIK_RULE}
+      traefik.http.services.postgraphile.loadbalancer.server.port: ${POSTGRAPHILE_PORT}

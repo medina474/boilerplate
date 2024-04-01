@@ -8,5 +8,5 @@ RUN npm install -g postgraphile &&\
   npm install -g postgraphile-plugin-connection-filter-postgis &&\
   npm install -g postgraphile-plugin-fulltext-filter
 
-EXPOSE 5433
+EXPOSE 5000
 ENTRYPOINT ["postgraphile", "-n", "0.0.0.0", "--cors"]

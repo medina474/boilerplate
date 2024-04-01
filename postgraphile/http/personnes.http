@@ -1,16 +1,19 @@
-OPTIONS  http://localhost:8003/graphql
+OPTIONS  https://boilerplate.docker.org/postgraphile/graphql
 Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
 
 ###
-POST http://localhost:8003/graphql
+POST https://boilerplate.docker.org/postgraphile/graphql
 Content-Type: application/graphql
 
-query Acteurs {
-  allActeurs(first: 10) {
-    nodes {
-      name
-      photo
+query MyQuery {
+  query {
+    allEmployes {
+      nodes {
+        nom
+        poste
+        salaire
+      }
     }
   }
 }
