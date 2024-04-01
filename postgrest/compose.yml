@@ -1,7 +1,7 @@
 networks:
   postgresql_internal:
     external: true
-  host_bridge:
+  proxy_internal:
     external: true
 
 services:
@@ -18,8 +18,14 @@ services:
       PGRST_APP_SETTINGS_JWT_SECRET: ${PGRST_APP_SETTINGS_JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${PGRST_APP_SETTINGS_JWT_EXP}
     command: postgrest
-    ports:
-      - 3000:3000
     networks:
       - postgresql_internal
-      - host_bridge
+      - proxy_internal
+    labels:
+      traefik.enable: true
+      traefik.http.routers.postgrest.entrypoints: websecure
+      traefik.http.routers.postgrest.tls: true
+      traefik.http.routers.postgrest.rule: ${POSTGREST_TRAEFIK_RULE}
+      traefik.http.services.postgrest.loadbalancer.server.port: ${POSTGREST_PORT}
+      traefik.http.middlewares.postgrest-strip.stripprefix.prefixes: /postgrest
+      traefik.http.routers.postgrest.middlewares: postgrest-strip

@@ -1,7 +1,4 @@
 networks:
-  postgraphile_host:
-    name: postgraphile_host
-    driver: bridge
   postgresql_internal:
     external: true
   proxy_internal:
@@ -13,7 +10,7 @@ services:
     image: boilerplate/postgraphile:2024.03
     container_name: postgraphile
     build:
-      context: ./postgraphile
+      context: ./
     environment:
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT:-5432}
@@ -22,7 +19,6 @@ services:
       - PGPASSWORD=${PGPASSWORD}
     networks:
       - postgresql_internal
-      - postgraphile_host
       - proxy_internal
     command:
       [
