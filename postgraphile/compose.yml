@@ -23,8 +23,6 @@ services:
     command:
       [
         "--port", "${POSTGRAPHILE_PORT:-5000}",
-        "--graphql", "/postgraphile/graphql",
-        "--graphiql", "/postgraphile/graphiql",
         "--schema", "${POSTGRAPHILE_SCHEMA}",
         "--enhance-graphiql",
         "--cors",
@@ -39,3 +37,5 @@ services:
       traefik.http.routers.postgraphile.tls: true
       traefik.http.routers.postgraphile.rule: ${POSTGRAPHILE_TRAEFIK_RULE}
       traefik.http.services.postgraphile.loadbalancer.server.port: ${POSTGRAPHILE_PORT}
+      traefik.http.middlewares.postgraphile-strip.stripprefix.prefixes: /postgraphile
+      traefik.http.routers.postgraphile.middlewares: postgraphile-strip

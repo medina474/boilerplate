@@ -36,3 +36,14 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    container_name: postgres-exporter
+    networks:
+      - postgresql_internal
+      - host_bridge
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://postgres:supermotdepasse@postgresql:5432/postgres?sslmode=disable
