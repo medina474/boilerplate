@@ -1,13 +1,17 @@
 networks:
-  host_bridge:
-    external: true
   postgresql_internal:
     name: postgresql_internal
     internal: true
+  proxy_internal:
+    external: true
+  host_bridge:
+    external: true
 
 configs:
-  postgresql_config:
+  postgresql_initdb:
     file: ./initdb.d
+  pgadmin_config:
+    file: ./pgadmin-servers.json
 
 services:
 
@@ -26,10 +30,10 @@ services:
       - postgresql_internal
       - host_bridge
     configs:
-      - source: postgresql_config
+      - source: postgresql_initdb
         target: /docker-entrypoint-initdb.d/
     volumes:
-      - ./data/:/var/lib/postgresql/data
+      - ./data/postgresql/:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d ${POSTGRES_DB}'"]
       interval: 15s
@@ -40,6 +44,8 @@ services:
   prometheus-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
     container_name: prometheus-exporter
+    depends_on:
+      - postgresql
     networks:
       - postgresql_internal
       - host_bridge
@@ -47,3 +53,29 @@ services:
       - 9187:9187
     environment:
       DATA_SOURCE_NAME: postgresql://postgres:supermotdepasse@postgresql:5432/postgres?sslmode=disable
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:${PGADMIN_VERSION:-8.4}
+    depends_on:
+      - postgresql
+    restart: no
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DISABLE_POSTFIX: true
+      SCRIPT_NAME: /pgadmin
+    configs:
+      - source: pgadmin_config
+        target: /pgadmin4/servers.json
+    volumes:
+      - ./data/pgadmin/:/var/lib/pgadmin/
+    networks:
+      - proxy_internal
+      - postgresql_internal
+    labels:
+      traefik.enable: true
+      traefik.http.routers.pgadmin.entrypoints: websecure
+      traefik.http.routers.pgadmin.tls: true
+      traefik.http.routers.pgadmin.rule: ${PGADMIN_TRAEFIK_RULE}
+      traefik.http.services.pgadmin.loadbalancer.server.port: 80
