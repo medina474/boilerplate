@@ -29,3 +29,13 @@ services:
       traefik.http.services.postgrest.loadbalancer.server.port: ${POSTGREST_PORT}
       traefik.http.middlewares.postgrest-strip.stripprefix.prefixes: /postgrest
       traefik.http.routers.postgrest.middlewares: postgrest-strip
+
+  redocly:
+    container_name: redocly
+    image: redocly/redoc
+    networks:
+      - proxy_internal
+    ports:
+      - 8000:80
+    environment:
+      SPEC_URL: http://petstore.swagger.io/v2/swagger.json
