@@ -1,0 +1,4 @@
+services:
+  dejavu:
+    container_name: dejavu
+    image: appbaseio/dejavu:${VERSION:-3.6.1}

@@ -5,7 +5,6 @@ services:
     container_name: mongodb
     volumes:
       - ./data/mongodb:/data/db
-    restart: on-failure
 
   # For DataNode setup, graylog starts with a preflight UI, this is a change from just using OpenSearch/Elasticsearch.
   # Please take a look at the README at the top of this repo or the regular docs for more info.
@@ -63,4 +62,3 @@ services:
     volumes:
       - ./data/graylog/data:/usr/share/graylog/data/data
       - ./data/graylog/journal:/usr/share/graylog/data/journal
-    restart: on-failure

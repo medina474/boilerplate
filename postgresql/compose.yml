@@ -37,9 +37,9 @@ services:
       retries: 5
       start_period: 30s
 
-  postgres-exporter:
+  prometheus-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
-    container_name: postgres-exporter
+    container_name: prometheus-exporter
     networks:
       - postgresql_internal
       - host_bridge

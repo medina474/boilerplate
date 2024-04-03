@@ -1,0 +1,25 @@
+configs:
+  filebeat_config:
+    file: ./filebeat.yml
+
+services:
+  filebeat:
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION}
+    user: root
+    volumes:
+      - ./certs:/usr/share/filebeat/certs
+      - ./data:/usr/share/filebeat/data
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: filebeat_config
+        target: /usr/share/filebeat/filebeat.yml
+    environment:
+      - ELASTIC_USER=${ELASTIC_USER:-elastic}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash:9600
+    command:
+      - --strict.perms=false
