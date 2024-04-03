@@ -1,6 +1,7 @@
+### Ping
 GET http://boilerplate.docker.org/ping
 
-###
+### Prometheus metrics
 GET http://boilerplate.docker.org/metrics
 
 ###

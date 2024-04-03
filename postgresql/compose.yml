@@ -1,7 +1,7 @@
 networks:
   postgresql_internal:
     name: postgresql_internal
-    internal: true
+    driver: bridge
   proxy_internal:
     external: true
   host_bridge:
@@ -28,7 +28,6 @@ services:
       - 5432:5432
     networks:
       - postgresql_internal
-      - host_bridge
     configs:
       - source: postgresql_initdb
         target: /docker-entrypoint-initdb.d/
@@ -41,7 +40,7 @@ services:
       retries: 5
       start_period: 30s
 
-  prometheus-exporter:
+  postgres-metrics-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
     container_name: prometheus-exporter
     depends_on:
