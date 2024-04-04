@@ -1,0 +1,4 @@
+GET https://boilerplate.docker.org/postgrest/employes
+
+### OpenAPI
+GET https://boilerplate.docker.org/postgrest

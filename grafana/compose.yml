@@ -1,9 +1,5 @@
 networks:
-  proxy_internal:
-    external: true
-  host_bridge:
-    external: true
-  postgresql_internal:
+  boilerplate_network:
     external: true
 
 configs:
@@ -31,8 +27,7 @@ services:
     volumes:
       - ./data/grafana:/var/lib/grafana
     networks:
-      - proxy_internal
-      - postgresql_internal
+      - boilerplate_network
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_SECURITY_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_SECURITY_ADMIN_PASSWORD}
@@ -56,8 +51,7 @@ services:
     volumes:
       - ./data/prometheus:/prometheus
     networks:
-      - proxy_internal
-      - host_bridge
+      - boilerplate_network
     ports:
       - ${PROMETHEUS_PORT}:9090
     labels:
@@ -77,8 +71,7 @@ services:
       - source: alertmanager_config
         target: /etc/alertmanager
     networks:
-      - proxy_internal
-      - host_bridge
+      - boilerplate_network
     volumes:
       - ./data/alertmanager:/alertmanager
     labels:
