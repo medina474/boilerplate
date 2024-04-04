@@ -1,8 +1,5 @@
 networks:
-  dragonfly_internal:
-    name: dragonfly_internal
-    internal: true
-  host_bridge:
+  boilerplate_bridge:
     external: true
 
 services:
@@ -16,6 +13,6 @@ services:
       - ${DRAGONFLY_PORT:-6379}:6379
     networks:
       - dragonfly_internal
-      - host_bridge
+      - boilerplate_bridge
     volumes:
       - ./data/:/data/

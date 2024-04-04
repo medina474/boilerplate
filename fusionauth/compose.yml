@@ -1,3 +1,7 @@
+networks:
+  boilerplate_bridge:
+    external: true
+
 volumes:
   db_data:
   fa_config:
@@ -17,14 +21,9 @@ services:
       FUSIONAUTH_APP_RUNTIME_MODE: development
       FUSIONAUTH_APP_URL: http://fusionauth:9011
       SEARCH_TYPE: database
-
-
-    restart: unless-stopped
     ports:
       - 9011:9011
+    networks:
+      - boilerplate_bridge
     volumes:
       - fa_config:/usr/local/fusionauth/config
-
-networks:
-  iutsd-net:
-    external: true

@@ -1,7 +1,5 @@
 networks:
-  postgresql_internal:
-    external: true
-  proxy_internal:
+  boilerplate_bridge:
     external: true
 
 services:
@@ -18,8 +16,7 @@ services:
       - PGUSER=${PGUSER}
       - PGPASSWORD=${PGPASSWORD}
     networks:
-      - postgresql_internal
-      - proxy_internal
+      - boilerplate_bridge
     command:
       [
         "--port", "${POSTGRAPHILE_PORT:-5000}",

@@ -1,6 +1,5 @@
 networks:
-  proxy_internal:
-    name: proxy_internal
+  boilerplate_bridge:
     external: true
 
 services:
@@ -8,7 +7,7 @@ services:
     container_name: smtp4dev
     image: rnwood/smtp4dev:${SMTP4DEV_VERSION:-linux-amd64-3.3.4}
     networks:
-      - proxy_internal
+      - boilerplate_bridge
     volumes:
       - ./data:/smtp4dev
     ports:

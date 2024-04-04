@@ -1,9 +1,5 @@
 networks:
-  dragonfly_internal:
-    external: true
-  postgresql_internal:
-    external: true
-  proxy_internal:
+  boilerplate_bridge:
     external: true
 
 services:
@@ -12,9 +8,7 @@ services:
     container_name: directus
     image: directus/directus:${DIRECTUS_VERSION:-10.10}
     networks:
-      - dragonfly_internal
-      - postgresql_internal
-      - proxy_internal
+      - boilerplate_bridge
     volumes:
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions

@@ -22,4 +22,4 @@ data lake and database workloads. It is software-defined and runs on any cloud o
       exit 0;
       "
     networks:
-      - proxy_internal
+      - boilerplate_bridge

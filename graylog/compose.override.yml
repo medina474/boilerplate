@@ -1,21 +1,20 @@
 networks:
-  proxy_internal:
-    name: proxy_internal
+  boilerplate_bridge:
     external: true
 
 services:
 
   mongodb:
     networks:
-      - proxy_internal
+      - boilerplate_bridge
 
   datanode:
     networks:
-      - proxy_internal
+      - boilerplate_bridge
 
   graylog:
     networks:
-      - proxy_internal
+      - boilerplate_bridge
     labels:
       traefik.enable: true
       traefik.http.services.graylog.loadbalancer.server.port: 9000

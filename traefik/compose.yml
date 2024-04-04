@@ -24,7 +24,7 @@ services:
 
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=proxy_internal"
+      - "--providers.docker.network=boilerplate_bridge"
       - "--providers.file.directory=/etc/traefik/dynamic"
 
       - "--metrics=true"

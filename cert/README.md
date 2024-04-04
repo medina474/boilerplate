@@ -1,4 +1,4 @@
-Protocole TLS
+# Protocole TLS
 
 Le protocole TLS n'est pas structurellement différent de la version 3 de SSL, mais des modifications dans l'utilisation des fonctions de hachage font que les deux protocoles ne sont pas directement interopérables. Cependant TLS, comme SSL 3.0, intègre un mécanisme de compatibilité ascendante avec les versions précédentes, c'est-à-dire qu'au début de la phase de négociation, où le client et le serveur négocient la « meilleure » version du protocole disponible par tous deux. Pour des raisons de sécurité la compatibilité de TLS avec SSL 2.0 est abandonnée en 2011.
 
@@ -134,7 +134,8 @@ IP.1 = 192.168.1.19
 
 ```
 openssl x509 -req -in boilerplate.csr ^
-  -CA master.crt -CAkey master.key -CAcreateserial ^
+  -CA master.crt -CAkey master.key
+  -CAcreateserial ^
   -extensions v3_req ^
   -extfile extensions.cnf ^
   -out boilerplate.crt
@@ -142,13 +143,10 @@ openssl x509 -req -in boilerplate.csr ^
 
 La commande x509 est utilisée pour générer un certificat au format PKCS # 10.
 
+**CA** : certificat de l'autorité qui signe ce certificat
 
-CA : certificat de l'autorité qui signe ce certificat
+**CAkey** : clé privée de certificat d'autorité
 
-CAkey : clé privée de certificat d'autorité
+*CAcreateserial* : fichier qui va contenir un identifiant de sérialisation, la prochaine fois utiliser l'option CAserial qui va incrémenter ce numéro de série.
 
-CAcreateserial : fichier qui va contenir un identifiant de sérialisation, la prochaine fois utiliser l'option
-
-CAserial qui va incrémenter ce numéro de série.
-
-extfile : fichier qui va contenir la configuration requise pour l'extension
+**extfile** : fichier qui va contenir la configuration requise pour l'extension
