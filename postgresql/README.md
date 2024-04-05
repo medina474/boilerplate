@@ -13,3 +13,8 @@ Aucun ORM n’est impliqué. La création de nouvelles vues se produit dans SQL 
 Une chose bien
 
 PostgREST a une portée ciblée. Cela fonctionne bien avec d'autres outils comme Nginx. Cela vous oblige à séparer clairement les opérations CRUD centrées sur les données des autres préoccupations. Utilisez une collection d’outils tranchants plutôt que de construire une grosse boule de boue.
+
+
+Copier dans le dossier postgresql/initdb les fichiers sql
+
+Copier dans le dossier postgresql/tmp les fichiers csv

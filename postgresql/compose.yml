@@ -104,8 +104,6 @@ services:
       - postgrest
     networks:
       - boilerplate_network
-    ports:
-      - 8000:80
     environment:
       SPEC_URL: https://boilerplate.docker.org/postgrest
       BASE_PATH: redocly/
@@ -117,3 +115,36 @@ services:
       traefik.http.services.redocly.loadbalancer.server.port: ${REDOCLY_PORT:-80}
       traefik.http.middlewares.redocly-strip.stripprefix.prefixes: /redocly
       traefik.http.routers.redocly.middlewares: redocly-strip
+
+  postgraphile:
+    image: boilerplate/postgraphile:2024.03
+    container_name: postgraphile
+    build:
+      context: ./postgraphile
+    environment:
+      - PGHOST=${POSTGRAPHILE_HOST}
+      - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
+      - PGDATABASE=${POSTGRAPHILE_DATABASE}
+      - PGUSER=${POSTGRAPHILE_USER}
+      - PGPASSWORD=${POSTGRAPHILE_PASSWORD}
+    networks:
+      - boilerplate_network
+    command:
+      [
+        "--port", "${POSTGRAPHILE_PORT:-5000}",
+        "--schema", "${POSTGRAPHILE_SCHEMA}",
+        "--enhance-graphiql",
+        "--cors",
+        "--allow-explain",
+        "--dynamic-json",
+        "--append-plugins",
+        "postgraphile-plugin-connection-filter,postgraphile-plugin-fulltext-filter,@graphile/postgis,postgraphile-plugin-connection-filter-postgis"
+      ]
+    labels:
+      traefik.enable: true
+      traefik.http.routers.postgraphile.entrypoints: websecure
+      traefik.http.routers.postgraphile.tls: true
+      traefik.http.routers.postgraphile.rule: ${POSTGRAPHILE_TRAEFIK_RULE}
+      traefik.http.services.postgraphile.loadbalancer.server.port: ${POSTGRAPHILE_PORT}
+      traefik.http.middlewares.postgraphile-strip.stripprefix.prefixes: /postgraphile
+      traefik.http.routers.postgraphile.middlewares: postgraphile-strip
