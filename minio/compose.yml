@@ -1,5 +1,5 @@
 networks:
-  boilerplate_bridge:
+  boilerplate_network:
     external: true
 
 services:
@@ -22,7 +22,7 @@ services:
       - 9000:9000
       - 9001:9001
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
     labels:
       traefik.enable: true
       traefik.http.routers.minio.entrypoints: websecure

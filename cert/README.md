@@ -134,7 +134,7 @@ IP.1 = 192.168.1.19
 
 ```
 openssl x509 -req -in boilerplate.csr ^
-  -CA master.crt -CAkey master.key
+  -CA master.crt -CAkey master.key ^
   -CAcreateserial ^
   -extensions v3_req ^
   -extfile extensions.cnf ^

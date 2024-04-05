@@ -6,5 +6,5 @@ services:
       traefik.http.services.webdev.loadbalancer.server.port: 80
 
 networks:
-  boilerplate_bridge:
+  boilerplate_network:
     external: true

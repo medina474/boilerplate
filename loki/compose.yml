@@ -21,5 +21,4 @@ services:
     volumes:
       - ./data/loki:/loki
     networks:
-      - boilerplate_bridge
-    logging: *default-logging
+      - boilerplate_network

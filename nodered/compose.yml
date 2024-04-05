@@ -1,5 +1,5 @@
 networks:
-  boilerplate_bridge:
+  boilerplate_network:
     external: true
 
 configs:
@@ -19,7 +19,7 @@ services:
     volumes:
       - ./data:/data
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
     labels:
       traefik.enable: true
       traefik.http.routers.nodered.entrypoints: websecure

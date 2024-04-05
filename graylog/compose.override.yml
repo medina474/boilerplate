@@ -1,20 +1,20 @@
 networks:
-  boilerplate_bridge:
+  boilerplate_network:
     external: true
 
 services:
 
   mongodb:
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
 
   datanode:
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
 
   graylog:
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
     labels:
       traefik.enable: true
       traefik.http.services.graylog.loadbalancer.server.port: 9000

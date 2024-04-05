@@ -1,5 +1,5 @@
 networks:
-  boilerplate_bridge:
+  boilerplate_network:
     external: true
 
 volumes:
@@ -24,6 +24,6 @@ services:
     ports:
       - 9011:9011
     networks:
-      - boilerplate_bridge
+      - boilerplate_network
     volumes:
       - fa_config:/usr/local/fusionauth/config
