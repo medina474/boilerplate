@@ -9,6 +9,9 @@ services:
     environment:
       TZ: Europe/Paris
       ISC_PASSWORD: ${FIREBIRD_PASSWORD}
+      FIREBIRD_DATABASE: boilerplate
+      FIREBIRD_USER: boilerplate
+      FIREBIRD_PASSWORD: ${FIREBIRD_PASSWORD}
     volumes:
       - data_firebird:/firebird
     ports:
