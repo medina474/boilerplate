@@ -14,4 +14,4 @@ services:
       - host_bridge
       - postgresql_internal
     environment:
-      - FERRETDB_POSTGRESQL_URL=${FERRETDB_POSTGRESQL_URL}
+      FERRETDB_POSTGRESQL_URL: ${FERRETDB_POSTGRESQL_URL}

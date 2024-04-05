@@ -1,0 +1,18 @@
+volumes:
+  data_firebird:
+
+services:
+
+  firebird:
+    container_name: firebird
+    image: jacobalberty/firebird:${FIREBIRD_VERSION}
+    environment:
+      TZ: Europe/Paris
+      ISC_PASSWORD: ${FIREBIRD_PASSWORD}
+      FIREBIRD_DATABASE: boilerplate
+      FIREBIRD_USER: boilerplate
+      FIREBIRD_PASSWORD: ${FIREBIRD_PASSWORD}
+    volumes:
+      - data_firebird:/firebird
+    ports:
+      - 3050:3050/tcp
