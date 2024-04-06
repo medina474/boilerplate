@@ -1,8 +1,8 @@
 ### Ping
-GET http://boilerplate.docker.org/ping
+GET http://localhost/ping
 
 ### Prometheus metrics
-GET http://boilerplate.docker.org/metrics
+GET http://localhost/metrics
 
 ###
-GET https://boilerplate.docker.org/whoami
+GET https://localhost/whoami
