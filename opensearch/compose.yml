@@ -7,6 +7,11 @@ services:
   opensearch-node1:
     image: opensearchproject/opensearch:${OPENSEARCH_VERSION}
     container_name: opensearch-node1
+    # command: >
+    #   /bin/sh -c "
+    #   ./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/2.13.0.0/prometheus-exporter-2.13.0.0.zip;
+    #   opensearch;
+    #   "
     environment:
       cluster.name: ${OPENSEARCH_CLUSTER_NAME}
       node.name: opensearch-node1      # Name the node that will run in this container
