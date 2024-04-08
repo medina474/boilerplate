@@ -1,5 +1,5 @@
 networks:
-  boilerplate-network:
+  boilerplate_network:
     external: true
 
 services:
@@ -15,8 +15,7 @@ services:
       #cluster.initial_cluster_manager_nodes: opensearch-node1,opensearch-node2 # Nodes eligible to serve as cluster manager
       bootstrap.memory_lock: true # Disable JVM heap memory swapping
       plugins.security.disabled: true
-      #xpack.security.enabled: false
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # Set min and max JVM heap sizes to at least 50% of system RAM
       OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}    # Sets the demo admin user password when using demo configuration, required for OpenSearch 2.12 and later
     ulimits:
       memlock:
@@ -31,16 +30,16 @@ services:
       - 9200:9200 # REST API
       - 9600:9600 # Performance Analyzer
     networks:
-      - boilerplate-network
+      - boilerplate_network
 
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION} # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
-    container_name: opensearch-dashboards
-    ports:
-      - 5601:5601 # Map host port 5601 to container port 5601
-    expose:
-      - 5601 # Expose port 5601 for web access to OpenSearch Dashboards
-    environment:
-      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
-    networks:
-      - boilerplate-network
+  # opensearch-dashboards:
+  #   image: opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION} # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
+  #   container_name: opensearch-dashboards
+  #   ports:
+  #     - 5601:5601 # Map host port 5601 to container port 5601
+  #   expose:
+  #     - 5601 # Expose port 5601 for web access to OpenSearch Dashboards
+  #   environment:
+  #     OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
+  #   networks:
+  #     - boilerplate_network

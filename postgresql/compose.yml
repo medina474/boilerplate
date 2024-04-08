@@ -121,6 +121,8 @@ services:
     container_name: postgraphile
     build:
       context: ./postgraphile
+    depends_on:
+      - postgresql
     environment:
       - PGHOST=${POSTGRAPHILE_HOST}
       - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
