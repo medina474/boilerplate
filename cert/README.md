@@ -57,8 +57,8 @@ distinguished_name = dn : rubrique à utiliser pour les informations du proprié
 ### 2. Générer le certificat de l'autorité racine ainsi que la clé privée associée
 
 ```shell-session
-openssl req -x509 -utf8 -newkey rsa:4096 -keyout master.key -config master.cnf
--extensions v3_ca -days 1826 -out master.crt
+openssl req -x509 -utf8 -newkey rsa:4096 -config master.cnf
+-extensions v3_ca -days 1826 -keyout master.key -out master.crt
 ```
 
 La commande req est utilisée pour traiter les demandes de création de certificats au format PKCS # 10. Nous l’utilisons ici pour créer un certificat auto-signé à utiliser comme autorité de certification racine.
@@ -69,13 +69,13 @@ La commande req est utilisée pour traiter les demandes de création de certific
 
 **newkey rsa:4096** : Génère la clé privée RSA (de longueur 4096 bits) en même temps que le certificat.
 
-**keyout** : Nom du fichier pour écrire la clé privée nouvellement créée (ici master.key).
-
 **config** : fichier de configuration à utiliser (ici master.cnf)
 
 **extensions** : rubrique du fichier de configuration à prendre en compte lors de la création du certificat. (ici les extensions v3_ca)
 
 **days** : Nombre de jours de validité du certificat. Nous définissons ici une validité de 5 ans.
+
+**keyout** : Nom du fichier pour écrire la clé privée nouvellement créée (ici master.key).
 
 **out** : Nom du fichier pour écrire le certificat.
 
@@ -92,8 +92,8 @@ Chrome – Paramètres – Rechercher : certificats – Gérer les certificats
 ### 1. Générer une demande de certificat et la clé privée associée
 
 ```shell-session
-openssl req -new -utf8 -newkey rsa:1024 -nodes -keyout boilerplate.key
--config boilerplate.cnf –out boilerplate.csr -days 180
+openssl req -new -utf8 -newkey rsa:1024 -nodes -config boilerplate.cnf
+ -days 180 -keyout boilerplate.key –out boilerplate.csr
 ```
 
 -new : générer une demande de certificat
