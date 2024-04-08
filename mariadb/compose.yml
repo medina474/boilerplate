@@ -17,6 +17,8 @@ services:
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
+# Administration
+
   phpmyadmin:
     image: phpmyadmin:${PHPMYADMIN_VERSION}
     container_name: phpmyadmin
@@ -38,3 +40,11 @@ services:
       traefik.http.middlewares.phpmyadmin-strip.stripprefix.prefixes: /phpmyadmin
       traefik.http.middlewares.phpmyadmin-strip.stripprefix.forceslash: false
       traefik.http.routers.phpmyadmin.middlewares: phpmyadmin-strip
+
+# Télémétrie
+# https://hub.docker.com/r/prom/mysqld-exporter/
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter
+    networks:
+      - boilerplate_network
