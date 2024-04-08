@@ -150,3 +150,15 @@ services:
       traefik.http.services.postgraphile.loadbalancer.server.port: ${POSTGRAPHILE_PORT}
       traefik.http.middlewares.postgraphile-strip.stripprefix.prefixes: /postgraphile
       traefik.http.routers.postgraphile.middlewares: postgraphile-strip
+
+  age_viewer:
+    image: boilerplate/age_viewer:2024.03
+    container_name: age_viewer
+    tty: true
+    build:
+      context: ./age-viewer
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    command: npm run start
+ #https://dev.to/munmud/how-to-run-apache-age-and-age-viewer-using-docker-207f

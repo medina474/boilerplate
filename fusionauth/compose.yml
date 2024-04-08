@@ -2,17 +2,13 @@ networks:
   boilerplate_network:
     external: true
 
-volumes:
-  db_data:
-  fa_config:
-
 services:
 
   fusionauth:
     image: fusionauth/fusionauth-app:latest
     container_name: fusionauth-app
     environment:
-      DATABASE_URL: jdbc:postgresql://192.168.0.107:5432/fusionauth
+      DATABASE_URL: jdbc:postgresql://postgresql:5432/fusionauth
       DATABASE_ROOT_USERNAME: ${POSTGRES_USER}
       DATABASE_ROOT_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
@@ -26,4 +22,4 @@ services:
     networks:
       - boilerplate_network
     volumes:
-      - fa_config:/usr/local/fusionauth/config
+      - ./data:/usr/local/fusionauth/config
