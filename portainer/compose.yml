@@ -1,0 +1,20 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:${PORTAINER_VERSION}
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/data
+    restart: always
+    labels:
+      traefik.enable: true
+      traefik.http.routers.smtp4dev.entrypoints: websecure
+      traefik.http.routers.smtp4dev.tls: true
+      traefik.http.routers.smtp4dev.rule: ${PORTAINER_TRAEFIK_RULE}
+      traefik.http.services.smtp4dev.loadbalancer.server.port: 9000
+
+volumes:
+  portainer_data:
