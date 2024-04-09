@@ -1,0 +1,17 @@
+networks:
+  boilerplate_network:
+    external: true
+
+services:
+  couchdb:
+    image: couchdb:${COUCH_DB_VERSION}
+    container_name: couchdb
+    environment:
+      COUCHDB_PASSWORD: ${COUCH_DB_PASSWORD}
+      COUCHDB_USER: ${COUCH_DB_USER}
+    volumes:
+      - ./data/:/opt/couchdb/data
+    ports:
+      - 5984:5984
+    networks:
+      - boilerplate_network

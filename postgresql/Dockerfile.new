@@ -225,3 +225,7 @@ STOPSIGNAL SIGINT
 
 EXPOSE 5432
 CMD ["postgres"]
+
+
+
+# https://github.com/paradedb/paradedb/tree/dev/docker
