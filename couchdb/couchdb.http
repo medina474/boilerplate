@@ -1,0 +1,5 @@
+GET http://localhost:5984/{{$dotenv COUCH_DB_PASSWORD}}
+
+
+### List of databases
+curl -X GET http://admin:supermotdepasse@localhost:5984/_all_dbs
