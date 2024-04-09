@@ -6,8 +6,8 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - influxdb:/var/lib/influxdb2
-      - influxdb_config:/etc/influxdb2
+      - ./data/influxdb/data:/var/lib/influxdb2
+      - ./data/influxdb/config:/etc/influxdb2
     environment:
       DOCKER_INFLUXDB_INIT_MODE: ${INFLUXDB_INIT_MODE:-setup}
       DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME}
@@ -19,7 +19,7 @@ services:
 
   chronograf:
     container_name: chronograf
-    image: chronograf:${CHRONOGRAF_VERSION:-1.9.4-alpine}
+    image: chronograf:${CHRONOGRAF_VERSION:-1.9-alpine}
     ports:
       - 8888:8888
     volumes:
@@ -29,11 +29,11 @@ services:
     environment:
       INFLUXDB_URL: http://influxdb:8086
       INFLUXDB_USERNAME: iut
-      INFLUXDB_PASSWORD: ${PASSWORD}
+      INFLUXDB_PASSWORD: ${INFLUXDB_INIT_PASSWORD}
 
   telegraf:
     container_name: telegraf
-    image: telegraf:${TELEGRAF_VERSION:-1.29-alpine}
+    image: telegraf:${TELEGRAF_VERSION:-1.30-alpine}
     ports:
       - 8094:8094/udp
     volumes:

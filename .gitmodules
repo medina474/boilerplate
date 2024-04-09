@@ -1,0 +1,3 @@
+[submodule "postgresql/age-viewer"]
+	path = postgresql/age-viewer
+	url = https://github.com/apache/age-viewer.git
