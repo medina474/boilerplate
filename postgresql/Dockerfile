@@ -18,4 +18,10 @@ RUN apt-cache showpkg postgresql-16-periods \
   && apt-get install -y --no-install-recommends \
     postgresql-16-periods
 
+# pgRouting
+# https://github.com/pgRouting/pgrouting/wiki/Notes-on-Download,-Installation-and-building-pgRouting
+# RUN apt-cache showpkg postgresql-16-pgrouting \
+#   && apt-get install -y --no-install-recommends \
+#    postgresql-16-pgrouting
+
 RUN rm -rf /var/lib/apt/lists/*
