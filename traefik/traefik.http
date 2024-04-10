@@ -4,5 +4,27 @@ GET http://localhost/ping
 ### Prometheus metrics
 GET http://localhost/metrics
 
-###
+
+### whoami
 GET https://localhost/whoami
+
+### whoami
+GET https://localhost/whoami?wait=3s
+
+
+
+### api (reponse au format json)
+GET https://localhost/whoami/api?env=true
+
+
+### data
+GET https://localhost/whoami/data?size=100
+
+
+### health write
+POST https://localhost/whoami/health
+
+474
+
+### health read
+HEAD https://localhost/whoami/health

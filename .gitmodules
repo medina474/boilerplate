@@ -1,3 +1,6 @@
 [submodule "postgresql/age-viewer"]
 	path = postgresql/age-viewer
 	url = https://github.com/apache/age-viewer.git
+[submodule "postgresql/postgres"]
+	path = postgresql/postgres
+	url = https://github.com/docker-library/postgres
