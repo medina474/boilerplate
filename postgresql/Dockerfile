@@ -4,7 +4,10 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:bookworm-slim
+FROM debian:unstable-slim as base
+
+ARG POSTGIS_MAJOR=3
+ARG POSTGIS_VERSION=3.4.2+dfsg-1.pgdg110+1
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -50,7 +53,7 @@ RUN set -eux; \
   gosu --version; \
   gosu nobody true
 
-# make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
+# make the "fr_FR.UTF-8" locale so postgres will be utf-8 enabled by default
 RUN set -eux; \
   if [ -f /etc/dpkg/dpkg.cfg.d/docker ]; then \
   # if this file exists, we're likely in "debian:xxx-slim", and locales are thus being excluded so we need to remove that exclusion (since we need locales)
@@ -59,10 +62,9 @@ RUN set -eux; \
   ! grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
   fi; \
   apt-get update; apt-get install -y --no-install-recommends locales; rm -rf /var/lib/apt/lists/*; \
-  echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen; \
+  echo 'fr_FR.UTF-8 UTF-8' >> /etc/locale.gen; \
   locale-gen; \
-  locale -a | grep 'en_US.utf8'
-ENV LANG en_US.utf8
+  locale -a | grep 'fr_FR.utf8'
 
 RUN set -eux; \
   apt-get update; \
@@ -187,6 +189,23 @@ ENV PGDATA /var/lib/postgresql/data
 # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 VOLUME /var/lib/postgresql/data
+
+# Postgis
+# ============================================================
+RUN apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
+  && apt-get install -y --no-install-recommends \
+  # ca-certificates: for accessing remote raster files;
+  #   fix: https://github.com/postgis/docker-postgis/issues/307
+  ca-certificates \
+  \
+  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
+  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts
+
+# Periods
+# ============================================================
+RUN apt-cache showpkg postgresql-16-periods \
+  && apt-get install -y --no-install-recommends \
+  postgresql-16-periods
 
 COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh

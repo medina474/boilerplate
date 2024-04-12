@@ -1,10 +1,10 @@
 services:
 
-  mongodb:
-    image: mongo:5.0
-    container_name: mongodb
-    volumes:
-      - ./data/mongodb:/data/db
+  # mongodb:
+  #   image: mongo:5.0
+  #   container_name: mongodb
+  #   volumes:
+  #     - ./data/mongodb:/data/db
 
   # For DataNode setup, graylog starts with a preflight UI, this is a change from just using OpenSearch/Elasticsearch.
   # Please take a look at the README at the top of this repo or the regular docs for more info.
@@ -45,7 +45,7 @@ services:
       GRAYLOG_ROOT_PASSWORD_SHA2: ${GRAYLOG_ROOT_PASSWORD_SHA2:?Please configure GRAYLOG_ROOT_PASSWORD_SHA2 in the .env file}
       GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
       GRAYLOG_HTTP_EXTERNAL_URI: https://graylog.docker.org/
-      GRAYLOG_MONGODB_URI: mongodb://mongodb:27017/graylog
+      GRAYLOG_MONGODB_URI: mongodb://dragonfly:27017/graylog
     ports:
     - 9000:9000/tcp   # Server API
     - 5044:5044/tcp   # Beats
