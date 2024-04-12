@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:unstable-slim as base
+FROM debian:testing-slim as base
 
 ARG POSTGIS_MAJOR=3
 ARG POSTGIS_VERSION=3.4.2+dfsg-1.pgdg110+1
@@ -19,6 +19,7 @@ RUN set -eux; \
   mkdir -p /var/lib/postgresql; \
   chown -R postgres:postgres /var/lib/postgresql
 
+# Utilitaires : gnupg et less
 RUN set -ex; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
@@ -27,6 +28,9 @@ RUN set -ex; \
   # https://github.com/postgres/postgres/blob/REL_16_1/src/include/fe_utils/print.h#L25
   # (if "less" is available, it gets used as the default pager for psql, and it only adds ~1.5MiB to our image size)
   less \
+  # ca-certificates: for accessing remote raster files;
+  #   fix: https://github.com/postgis/docker-postgis/issues/307
+  ca-certificates \
   ; \
   rm -rf /var/lib/apt/lists/*
 
@@ -100,7 +104,7 @@ RUN set -ex; \
   export PYTHONDONTWRITEBYTECODE=1; \
   \
   dpkgArch="$(dpkg --print-architecture)"; \
-  aptRepo="[ signed-by=/usr/local/share/keyrings/postgres.gpg.asc ] http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main $PG_MAJOR"; \
+  aptRepo="[ signed-by=/usr/local/share/keyrings/postgres.gpg.asc ] http://apt.postgresql.org/pub/repos/apt/ trixie-pgdg main $PG_MAJOR"; \
   case "$dpkgArch" in \
   amd64 | arm64 | ppc64el | s390x) \
   # arches officialy built by upstream
@@ -194,14 +198,11 @@ VOLUME /var/lib/postgresql/data
 # ============================================================
 RUN apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
   && apt-get install -y --no-install-recommends \
-  # ca-certificates: for accessing remote raster files;
-  #   fix: https://github.com/postgis/docker-postgis/issues/307
-  ca-certificates \
-  \
-  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
-  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts
+  postgresql-${PG_MAJOR}-postgis-${POSTGIS_MAJOR}=${POSTGIS_VERSION} \
+  postgresql-${PG_MAJOR}-postgis-${POSTGIS_MAJOR}-scripts
 
 # Periods
+# https://github.com/xocolatl/periods
 # ============================================================
 RUN apt-cache showpkg postgresql-16-periods \
   && apt-get install -y --no-install-recommends \
