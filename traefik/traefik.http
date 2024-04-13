@@ -6,7 +6,7 @@ GET http://localhost/metrics
 
 
 ### whoami
-GET https://localhost/whoami
+GET http://localhost/whoami
 
 ### whoami
 GET https://localhost/whoami?wait=3s
@@ -18,7 +18,7 @@ GET https://localhost/whoami/api?env=true
 
 
 ### data
-GET https://localhost/whoami/data?size=100
+GET https://localhost/whoami/data?size=1000
 
 
 ### health write
@@ -28,3 +28,6 @@ POST https://localhost/whoami/health
 
 ### health read
 HEAD https://localhost/whoami/health
+
+### bench
+HEAD https://localhost/whoami/benc
