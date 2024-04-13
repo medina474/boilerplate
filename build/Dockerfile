@@ -1,5 +1,5 @@
 #docker build ./ -t boilerplate/build:2024.04
-FROM debian:trixie-slim
+FROM debian:testing-slim as base
 
 RUN set -ex; \
   apt-get update; \

@@ -18,3 +18,6 @@ PostgREST a une portée ciblée. Cela fonctionne bien avec d'autres outils comme
 Copier dans le dossier postgresql/initdb les fichiers sql
 
 Copier dans le dossier postgresql/tmp les fichiers csv
+
+
+docker build ./ -t boilerplate/postgresql:2024.04
