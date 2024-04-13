@@ -2,20 +2,7 @@ networks:
   boilerplate_network:
     external: true
 
-services:
-
-  k6:
-    image: grafana/k6:${K6_VERSION}
-    container_name: k6
-    ports:
-      - 6565:6565
-    networks:
-      - boilerplate_network
-    environment:
-      K6_OUT: influxdb=http://influxdb:8086/k6
-    volumes:
-      - ./scripts:/scripts
-
+services:   
   # siteinspector:
   #   image: siteinspector/siteinspector:latest
   #   container_name: siteinspector
