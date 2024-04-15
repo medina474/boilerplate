@@ -1,12 +1,9 @@
-#
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#
-# PLEASE DO NOT EDIT IT DIRECTLY.
-#
-
 FROM debian:bookworm-slim as base
 
 ARG timescaledb_release=2.13.0
+ARG libsodium_release=1.0.18
+ARG pgsodium_release=3.1.6
+ARG pgrouting_release=3.6.2
 
 FROM base as builder
 # Install build dependencies
@@ -14,15 +11,18 @@ FROM base as builder
 
 RUN  echo "deb http://deb.debian.org/debian/ testing non-free contrib main" > /etc/apt/sources.list.d/pgdg.list
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    build-essential \
     postgresql-server-dev-16 \
-    && rm -rf /var/lib/apt/lists/*
+  ;\
+  rm -rf /var/lib/apt/lists/*;
 #RUN mv /var/cache/apt/archives/*.deb /tmp/
 
 RUN apt-get update && \
     rm -f /tmp/libssl-dev* && \
     apt-get install -y --no-install-recommends \
-    build-essential \
     checkinstall \
     cmake \
     && rm -rf /var/lib/apt/lists/* /tmp/*
@@ -37,7 +37,7 @@ ENV PATH=/usr/lib/ccache:$PATH
 ARG CACHE_EPOCH
 
 ####################
-# 10-timescaledb.yml
+# timescaledb
 ####################
 FROM builder as timescaledb-source
 # Download and extract
@@ -49,12 +49,47 @@ RUN tar -xvf /tmp/timescaledb.tar.gz -C /tmp && \
     rm -rf /tmp/timescaledb.tar.gz
 # Build from source
 WORKDIR /tmp/timescaledb-${timescaledb_release}/build
-RUN cmake -DAPACHE_ONLY=1 ..
+RUN cmake ..
 RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccache \
     make -j$(nproc)
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
 RUN ls /tmp
+
+####################
+# 18-pgsodium.yml
+####################
+FROM builder as libsodium
+# Download and extract
+ARG libsodium_release
+ARG libsodium_release_checksum
+ADD --checksum=${libsodium_release_checksum} \
+  "https://download.libsodium.org/libsodium/releases/libsodium-${libsodium_release}.tar.gz" \
+  /tmp/libsodium.tar.gz
+RUN tar -xvf /tmp/libsodium.tar.gz -C /tmp && \
+  rm -rf /tmp/libsodium.tar.gz
+# Build from source
+WORKDIR /tmp/libsodium-${libsodium_release}
+RUN ./configure
+RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccache \
+  make -j$(nproc)
+RUN make install
+
+FROM libsodium as pgsodium-source
+# Download and extract
+ARG pgsodium_release
+ARG pgsodium_release_checksum
+ADD --checksum=${pgsodium_release_checksum} \
+  "https://github.com/michelp/pgsodium/archive/refs/tags/v${pgsodium_release}.tar.gz" \
+  /tmp/pgsodium.tar.gz
+RUN tar -xvf /tmp/pgsodium.tar.gz -C /tmp && \
+  rm -rf /tmp/pgsodium.tar.gz
+# Build from source
+WORKDIR /tmp/pgsodium-${pgsodium_release}
+RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccache \
+  make -j$(nproc)
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --requires=libsodium23 --nodoc
 
 FROM base as final
 
@@ -76,7 +111,7 @@ RUN set -eux; \
 	mkdir -p /var/lib/postgresql; \
 	chown -R postgres:postgres /var/lib/postgresql
 
-RUN set -ex; \
+RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		gnupg \

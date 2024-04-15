@@ -30,4 +30,4 @@ POST https://localhost/whoami/health
 HEAD https://localhost/whoami/health
 
 ### bench
-HEAD https://localhost/whoami/benc
+HEAD https://localhost/whoami/bench
