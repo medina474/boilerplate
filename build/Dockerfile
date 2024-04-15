@@ -11,7 +11,10 @@ ARG periods_release=1.2.2
 ARG periods_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
 
 ARG age_release=1.5.0-rc0
-ARG age_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
+ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
+
+ARG pgvector_release=0.6.2
+ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
 
 ARG libsodium_release=1.0.18
 ARG libsodium_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
@@ -37,8 +40,6 @@ RUN set -eux; \
     ; \
   rm -rf /var/lib/apt/lists/*;
 
-# =============================================================================
-# PostgreSQL
 
 # =============================================================================
 # PostGIS
@@ -79,6 +80,10 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 
 
 # =============================================================================
+# PostgreSQL
+
+
+# =============================================================================
 # Periods
 # https://github.com/xocolatl/periods
 # Periods est une extension qui prend en charge les tables temporelles
@@ -103,7 +108,7 @@ WORKDIR /tmp/periods-${periods_release}/build
 #RUN cmake ..
 
 # Create debian package
-#RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
+# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
 
 # =============================================================================
 # TimescaleDB
@@ -125,7 +130,7 @@ WORKDIR /tmp/timescaledb-${timescaledb_release}/build
 #RUN cmake ..
 
 # Create debian package
-#RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
+# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
 
 
 # =============================================================================
@@ -156,10 +161,10 @@ RUN set -eux; \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/age-${age_release}/build
-RUN cmake ..
+#RUN cmake ..
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
+#RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
 
 # =============================================================================
 # pgSodium
@@ -188,15 +193,37 @@ RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccac
 RUN make install
 
 # =============================================================================
+FROM base as pgvector
+
+ARG pgvector_release
+ARG pgvector_release_checksum
+
+ADD --checksum=${pgvector_release_checksum} \
+  "https://github.com/pgvector/pgvector/archive/refs/tags/v${pgvector_release}.tar.gz" \
+  /tmp/pgvector.tar.gz
+
+RUN tar -xvf /tmp/pgvector.tar.gz -C /tmp && \
+  rm -rf /tmp/pgvector.tar.gz
+
+# Build from source
+WORKDIR /tmp/pgvector-${pgvector_release}
+
+
+# Create debian package
+# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
+
+# =============================================================================
 # Image finale de production
 #
 FROM debian:testing-slim as production
 
 # Copier les packages des différents images
 COPY --from=timescaledb /tmp /tmp
+COPY --from=age /tmp /tmp
 COPY --from=pgrouting /tmp /tmp
 COPY --from=periods /tmp /tmp
 
-RUN apt-get install /tmp/*.deb -y
+RUN set -eux; \
+  apt-get install /tmp/*.deb -y;
 
 CMD tail -f /dev/null
