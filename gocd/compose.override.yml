@@ -3,6 +3,7 @@ services:
   gocd:
     labels:
       traefik.enable: true
+      traefik.http.routers.gocd.entrypoints: websecure
+      traefik.http.routers.gocd.tls: true
       traefik.http.services.gocd.loadbalancer.server.port: 8153
       traefik.http.routers.gocd.rule: ${GOCD_TRAEFIK_RULE}
-      traefik.http.routers.gocd.entrypoints: web

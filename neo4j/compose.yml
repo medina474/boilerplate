@@ -9,4 +9,4 @@ services:
     volumes:
       - ./data:/data
     environment:
-      NEO4J_AUTH: neo4j/mypassword
+      NEO4J_AUTH: neo4j/supermotdepasse
