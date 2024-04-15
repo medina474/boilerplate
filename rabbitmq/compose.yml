@@ -1,0 +1,19 @@
+configs:
+  rabbit_enabled_plugins:
+    file: ./rabbit_enabled_plugins
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-alpine
+    ports:
+      - 15672:15672
+    volumes:
+      - ./data:/var/lib/rabbitmq
+      - ./log:/var/log/rabbitmq
+    configs:
+      - source: rabbit_enabled_plugins
+        target: /etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: supermotdepasse
