@@ -1,3 +1,7 @@
+networks:
+  boilerplate_network:
+    external: true
+
 services:
 
   mongodb:

@@ -5,15 +5,18 @@ GET http://localhost/ping
 GET http://localhost/metrics
 
 
-### whoami
+### whoami : 301 moved Permanently -> https
 GET http://localhost/whoami
 
 ### whoami
-GET https://localhost/whoami?wait=3s
+GET https://localhost/whoami
+
+### whoami
+GET https://localhost/whoami?wait=10s
 
 
 
-### api (reponse au format json)
+### api (réponse au format json)
 GET https://localhost/whoami/api?env=true
 
 

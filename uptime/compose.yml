@@ -8,13 +8,14 @@ services:
     container_name: uptime
     image: louislam/uptime-kuma:${UPTIME_VERSION}
     restart: unless-stopped
-    #ports:
-    #  - ${UPTIME_PORT}:3001
     volumes:
       - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - boilerplate_network
     labels:
       traefik.enable: true
-      traefik.http.services.uptime.loadbalancer.server.port: 3001
+      traefik.http.routers.uptime.entrypoints: websecure
+      traefik.http.routers.uptime.tls: true
+      traefik.http.services.uptime.loadbalancer.server.port: ${UPTIME_PORT}
       traefik.http.routers.uptime.rule: ${UPTIME_TRAEFIK_RULE}
