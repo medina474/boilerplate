@@ -8,8 +8,11 @@ GET http://localhost/metrics
 ### whoami : 301 moved Permanently -> https
 GET http://localhost/whoami
 
-### whoami
+### whoami : 301 moved Permanently -> /
 GET https://localhost/whoami
+
+### whoami
+GET https://localhost/whoami/
 
 ### whoami
 GET https://localhost/whoami?wait=10s

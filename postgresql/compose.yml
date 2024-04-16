@@ -94,8 +94,7 @@ services:
       traefik.http.routers.postgrest.tls: true
       traefik.http.routers.postgrest.rule: ${POSTGREST_TRAEFIK_RULE}
       traefik.http.services.postgrest.loadbalancer.server.port: ${POSTGREST_PORT}
-      traefik.http.middlewares.postgrest-strip.stripprefix.prefixes: /postgrest
-      traefik.http.routers.postgrest.middlewares: postgrest-strip
+      traefik.http.routers.postgrest.middlewares: strip-prefix
 
   redocly:
     container_name: redocly
@@ -113,8 +112,7 @@ services:
       traefik.http.routers.redocly.tls: true
       traefik.http.routers.redocly.rule: ${REDOCLY_TRAEFIK_RULE}
       traefik.http.services.redocly.loadbalancer.server.port: ${REDOCLY_PORT:-80}
-      traefik.http.middlewares.redocly-strip.stripprefix.prefixes: /redocly
-      traefik.http.routers.redocly.middlewares: redocly-strip
+      traefik.http.routers.redocly.middlewares: strip-prefix
 
   postgraphile:
     image: boilerplate/postgraphile:2024.03
@@ -148,8 +146,7 @@ services:
       traefik.http.routers.postgraphile.tls: true
       traefik.http.routers.postgraphile.rule: ${POSTGRAPHILE_TRAEFIK_RULE}
       traefik.http.services.postgraphile.loadbalancer.server.port: ${POSTGRAPHILE_PORT}
-      traefik.http.middlewares.postgraphile-strip.stripprefix.prefixes: /postgraphile
-      traefik.http.routers.postgraphile.middlewares: postgraphile-strip
+      traefik.http.routers.postgraphile.middlewares: strip-prefix
 
   age_viewer:
     image: boilerplate/age_viewer:2024.03

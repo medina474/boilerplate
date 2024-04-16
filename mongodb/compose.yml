@@ -14,9 +14,9 @@ services:
       - ${MONGODB_PORT:-27017}:27017
     networks:
       - boilerplate_network
-    #environment:
-    #  MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-    #  MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
 
   mongodb-exporter:
     container_name: mongodb-exporter

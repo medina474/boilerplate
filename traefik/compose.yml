@@ -77,7 +77,7 @@ services:
       traefik.http.routers.whoami.rule: ${WHOAMI_TRAEFIK_RULE}
       traefik.http.services.whoami.loadbalancer.server.port: 80
       traefik.http.routers.whoami.middlewares: strip-prefix
-      # redirect to https
+      # http -> redirect to https
       traefik.http.routers.whoami_unsecure.entrypoints: web
       traefik.http.routers.whoami_unsecure.rule: ${WHOAMI_TRAEFIK_RULE}
       traefik.http.routers.whoami_unsecure.middlewares: redirect_to_websecure
