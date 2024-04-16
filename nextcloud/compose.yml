@@ -1,0 +1,5 @@
+services:
+
+  php:
+    container_name: nextcloud-php
+    image: php:8.3.6-fpm-bookworm

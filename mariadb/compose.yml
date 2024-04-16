@@ -2,12 +2,22 @@ networks:
   boilerplate_network:
     external: true
 
+configs:
+  mariadb_initdb:
+    file: ./docker-entrypoint-initdb.d
+
 services:
 
+# MariaDB Server
+# https://mariadb.org/
+
   mariadb:
-    image: mariadb:${MARIADB_VERSION:-11.0}
+    image: mariadb:${MARIADB_VERSION:-11.3}
     container_name: mariadb
     restart: no
+    configs:
+      - source: mariadb_initdb
+        target: /docker-entrypoint-initdb.d
     volumes:
       - ./data:/var/lib/mysql
     networks:
@@ -18,6 +28,7 @@ services:
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
 # Administration
+# https://www.phpmyadmin.net/
 
   phpmyadmin:
     image: phpmyadmin:${PHPMYADMIN_VERSION}
