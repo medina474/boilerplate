@@ -17,10 +17,10 @@ ARG pgvector_release=0.6.2
 ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
 
 ARG libsodium_release=1.0.18
-ARG libsodium_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
+ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
 
 ARG pgsodium_release=3.1.6
-ARG pgsodium_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
+ARG pgsodium_release_checksum=sha256:f46af33b13ce895b3d8eb2c01c2d5b0b6528eab1e51cd624ddc54daea26e230e
 
 RUN set -eux; \
   apt-get update; \
@@ -203,6 +203,25 @@ RUN ./configure; \
   make -j$(nproc); \
   make install;
 
+FROM libsodium as pgsodium
+
+ARG pgsodium_release
+ARG pgsodium_release_checksum
+
+ADD --checksum=${pgsodium_release_checksum} \
+  "https://github.com/michelp/pgsodium/archive/refs/tags/v${pgsodium_release}.tar.gz" \
+  /tmp/pgsodium.tar.gz
+
+RUN tar -xvf /tmp/pgsodium.tar.gz -C /tmp && \
+  rm -rf /tmp/pgsodium.tar.gz
+
+  # Build from source
+WORKDIR /tmp/pgsodium-${pgsodium_release}
+RUN make -j$(nproc)
+
+  # Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --requires=libsodium23 --nodoc
+
 # =============================================================================
 FROM base as pgvector
 
@@ -234,6 +253,7 @@ COPY --from=age /tmp/*.deb /tmp
 COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
+COPY --from=pgsodium /tmp/ /tmp
 
 RUN set -eux; \
   apt-get install /tmp/*.deb -y;
