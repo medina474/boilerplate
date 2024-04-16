@@ -1,5 +1,15 @@
 services:
 
+  apache:
+    container_name: nextcloud-apache
+    image: nextcloud/apache:2024.03
+    build:
+      context: ./apache
+    ports:
+      - 8000:80
+
   php:
     container_name: nextcloud-php
     image: php:8.3.6-fpm-bookworm
+    build:
+      context: ./php
