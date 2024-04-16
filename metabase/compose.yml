@@ -1,0 +1,4 @@
+services:
+
+  metabase:
+    container_name: metabase

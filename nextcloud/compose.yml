@@ -2,14 +2,18 @@ services:
 
   apache:
     container_name: nextcloud-apache
-    image: nextcloud/apache:2024.03
+    image: nextcloud/apache:2024.04
     build:
       context: ./apache
     ports:
       - 8000:80
+    volumes:
+      - ./data:/var/www/html
 
   php:
     container_name: nextcloud-php
-    image: php:8.3.6-fpm-bookworm
+    image: nextcloud/php:2024.04
     build:
       context: ./php
+    volumes:
+      - ./data:/var/www/html
