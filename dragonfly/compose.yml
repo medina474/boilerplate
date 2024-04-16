@@ -14,4 +14,4 @@ services:
     networks:
       - boilerplate_network
     volumes:
-      - ./data/:/data/
+      - ./data:/data

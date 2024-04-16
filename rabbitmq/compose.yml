@@ -31,5 +31,3 @@ services:
       traefik.http.routers.rabbitmq.tls: true
       traefik.http.routers.rabbitmq.rule: ${RABBITMQ_TRAEFIK_RULE}
       traefik.http.services.rabbitmq.loadbalancer.server.port: 15672
-      traefik.http.middlewares.rabbitmq-strip.stripprefix.prefixes: /rabbitmq
-      traefik.http.routers.rabbitmq.middlewares: rabbitmq-strip
