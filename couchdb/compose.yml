@@ -10,7 +10,7 @@ services:
       COUCHDB_PASSWORD: ${COUCH_DB_PASSWORD}
       COUCHDB_USER: ${COUCH_DB_USER}
     volumes:
-      - ./data/:/opt/couchdb/data
+      - ./data:/opt/couchdb/data
     ports:
       - 5984:5984
     networks:

@@ -12,8 +12,18 @@ services:
       - ./data/db:/data/db
     ports:
       - ${MONGODB_PORT:-27017}:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - boilerplate_network
+    #environment:
+    #  MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+    #  MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+  mongodb-exporter:
+    container_name: mongodb-exporter
+    image: percona/mongodb_exporter:0.40.0
+    networks:
+      - boilerplate_network
+    ports:
+      - 9216:9216
+    environment:
+      MONGODB_URI: mongodb://mongodb:${MONGODB_PORT:-27017}
