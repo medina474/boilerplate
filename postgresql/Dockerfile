@@ -54,7 +54,7 @@ RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccac
     make -j$(nproc)
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
-RUN ls /tmp
+
 
 ####################
 # 18-pgsodium.yml
@@ -99,7 +99,6 @@ ARG POSTGIS_VERSION=3.4.2+dfsg-1
 ARG timescaledb_release=2.9.1
 
 COPY --from=timescaledb-source /tmp/*.deb /tmp/
-RUN ls /tmp
 
 # explicitly set user/group IDs
 RUN set -eux; \

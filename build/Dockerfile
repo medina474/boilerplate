@@ -2,7 +2,7 @@
 FROM debian:testing-slim as base
 
 ARG timescaledb_release=2.13.0
-ARG timescaledb_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
+ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
 
 ARG pgrouting_release=3.6.2
 ARG pgrouting_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
@@ -104,11 +104,12 @@ RUN set -eux; \
   tar -xvf /tmp/periods.tar.gz -C /tmp; \
   rm -rf /tmp/periods.tar.gz;
 
-WORKDIR /tmp/periods-${periods_release}/build
-#RUN cmake ..
+WORKDIR /tmp/periods-${periods_release}
+RUN make -j$(nproc)
 
 # Create debian package
-# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=periods --pkgversion=${periods_release} --nodoc
+
 
 # =============================================================================
 # TimescaleDB
@@ -118,19 +119,30 @@ ARG timescaledb_release
 ARG timescaledb_release_checksum
 
 # Download and extract
-ADD "https://github.com/timescale/timescaledb/archive/refs/tags/${timescaledb_release}.tar.gz" \
+ADD --checksum=${timescaledb_release_checksum} \
+  "https://github.com/timescale/timescaledb/archive/refs/tags/${timescaledb_release}.tar.gz" \
   /tmp/timescaledb.tar.gz
 
 RUN set -eux; \
   tar -xvf /tmp/timescaledb.tar.gz -C /tmp; \
   rm -rf /tmp/timescaledb.tar.gz;
 
-  # Build from source
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+  libkrb5-dev \
+  ; \
+  rm -rf /var/lib/apt/lists/*
+
+# Build from source
+WORKDIR /tmp/timescaledb-${timescaledb_release}
+RUN ./bootstrap
+
 WORKDIR /tmp/timescaledb-${timescaledb_release}/build
-#RUN cmake ..
+RUN make -j$(nproc)
 
 # Create debian package
-# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
 
 
 # =============================================================================
@@ -155,16 +167,16 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   libreadline-dev \
   zlib1g-dev \
-  flex \
   bison \
+  flex \
   ; \
   rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp/age-${age_release}/build
-#RUN cmake ..
+WORKDIR /tmp/age-PG16-v${age_release}
+RUN make -j$(nproc)
 
 # Create debian package
-#RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=age --pkgversion=${age_release} --nodoc
 
 # =============================================================================
 # pgSodium
@@ -187,10 +199,9 @@ RUN tar -xvf /tmp/libsodium.tar.gz -C /tmp && \
 
 # Build from source
 WORKDIR /tmp/libsodium-${libsodium_release}
-RUN ./configure
-RUN --mount=type=cache,target=/ccache,from=public.ecr.aws/supabase/postgres:ccache \
-  make -j$(nproc)
-RUN make install
+RUN ./configure; \
+  make -j$(nproc); \
+  make install;
 
 # =============================================================================
 FROM base as pgvector
@@ -207,10 +218,10 @@ RUN tar -xvf /tmp/pgvector.tar.gz -C /tmp && \
 
 # Build from source
 WORKDIR /tmp/pgvector-${pgvector_release}
-
+RUN make -j$(nproc)
 
 # Create debian package
-# RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 
 # =============================================================================
 # Image finale de production
@@ -218,10 +229,11 @@ WORKDIR /tmp/pgvector-${pgvector_release}
 FROM debian:testing-slim as production
 
 # Copier les packages des différents images
-COPY --from=timescaledb /tmp /tmp
-COPY --from=age /tmp /tmp
-COPY --from=pgrouting /tmp /tmp
-COPY --from=periods /tmp /tmp
+COPY --from=timescaledb /tmp/*.deb /tmp
+COPY --from=age /tmp/*.deb /tmp
+COPY --from=pgrouting /tmp/*.deb /tmp
+COPY --from=periods /tmp/*.deb /tmp
+COPY --from=pgvector /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install /tmp/*.deb -y;
