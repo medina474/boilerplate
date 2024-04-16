@@ -48,9 +48,7 @@ services:
       traefik.http.routers.phpmyadmin.tls: true
       traefik.http.routers.phpmyadmin.rule: ${PHPMYADMIN_TRAEFIK_RULE}
       traefik.http.services.phpmyadmin.loadbalancer.server.port: 80
-      traefik.http.middlewares.phpmyadmin-strip.stripprefix.prefixes: /phpmyadmin
-      traefik.http.middlewares.phpmyadmin-strip.stripprefix.forceslash: false
-      traefik.http.routers.phpmyadmin.middlewares: phpmyadmin-strip
+      traefik.http.routers.phpmyadmin.middlewares: strip-prefix
 
 # Télémétrie
 # https://hub.docker.com/r/prom/mysqld-exporter/
