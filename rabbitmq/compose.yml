@@ -1,3 +1,7 @@
+networks:
+  boilerplate_network:
+    external: true
+
 configs:
   rabbit_enabled_plugins:
     file: ./rabbit_enabled_plugins
@@ -6,8 +10,12 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-alpine
+    networks:
+      - boilerplate_network
     ports:
+      - 1883:1883
       - 15672:15672
+      - 61613:61613
     volumes:
       - ./data:/var/lib/rabbitmq
       - ./log:/var/log/rabbitmq
@@ -17,3 +25,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: supermotdepasse
+    labels:
+      traefik.enable: true
+      traefik.http.routers.rabbitmq.entrypoints: websecure
+      traefik.http.routers.rabbitmq.tls: true
+      traefik.http.routers.rabbitmq.rule: ${RABBITMQ_TRAEFIK_RULE}
+      traefik.http.services.rabbitmq.loadbalancer.server.port: 15672
+      traefik.http.middlewares.rabbitmq-strip.stripprefix.prefixes: /rabbitmq
+      traefik.http.routers.rabbitmq.middlewares: rabbitmq-strip

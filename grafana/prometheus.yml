@@ -66,6 +66,13 @@ scrape_configs:
       - targets:
           - 'dragonfly:6379'
 
+  - job_name: rabbitmq
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+          - 'rabbitmq:15692'
+
   #- job_name: "node"
 
     # metrics_path defaults to '/metrics'
