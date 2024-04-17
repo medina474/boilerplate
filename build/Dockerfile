@@ -4,7 +4,7 @@ FROM debian:testing-slim as base
 ARG timescaledb_release=2.13.0
 ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
 
-ARG postgis_release=2.5.0
+ARG postgis_release=3.4.2
 ARG postgis_release_checksum=sha256:99a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
 
 ARG pgrouting_release=3.6.2
@@ -47,6 +47,9 @@ RUN set -eux; \
 # =============================================================================
 # PostGIS
 FROM base as postgis
+
+ARG postgis_release
+ARG postgis_release_checksum
 
 ADD --checksum=${postgis_release_checksum} \
   "https://postgis.net/stuff/postgis-${postgis_release}dev.tar.gz" \
@@ -276,6 +279,7 @@ COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
+COPY --from=postgis /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install /tmp/*.deb -y;
