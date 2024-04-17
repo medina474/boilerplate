@@ -195,7 +195,7 @@ WORKDIR /tmp/age-PG16-v${age_release}
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=age --pkgversion=${age_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=age --nodoc
 
 # =============================================================================
 # pgSodium
@@ -221,6 +221,9 @@ WORKDIR /tmp/libsodium-${libsodium_release}
 RUN ./configure; \
   make -j$(nproc); \
   make install;
+
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=libsodium23 --nodoc
 
 FROM libsodium as pgsodium
 
@@ -272,7 +275,7 @@ COPY --from=age /tmp/*.deb /tmp
 COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
-COPY --from=pgsodium /tmp/ /tmp
+COPY --from=pgsodium /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install /tmp/*.deb -y;
