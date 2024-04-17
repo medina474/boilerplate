@@ -1,4 +1,5 @@
 FROM php:8.3.6-fpm-bookworm
+# https://github.com/markhilton/docker-php-fpm/tree/master
 
 # set locale to utf-8
 RUN apt-get update -y && apt-get install -y locales
@@ -50,6 +51,8 @@ RUN apt-get remove -y git && apt-get autoremove -y && apt-get clean && rm -rf /v
 
 # Change owner and group
 USER nextcloud:nextcloud
+
+ADD ./php.ini /usr/local/etc/php/php.ini
 
 VOLUME /var/www/html
 WORKDIR /var/www/html

@@ -9,7 +9,7 @@ RUN set -eux; \
 
 USER nextcloud:nextcloud
 
-COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
+ADD ./httpd.conf /usr/local/apache2/conf/httpd.conf
 
 VOLUME /var/www/html
 WORKDIR /var/www/html
