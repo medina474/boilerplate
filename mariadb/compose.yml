@@ -24,6 +24,8 @@ services:
       - ./data:/var/lib/mysql
     networks:
       - boilerplate_network
+    ports:
+      - 3306:3306
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_USER: ${MARIADB_USER}
@@ -67,5 +69,3 @@ services:
       - --config.my-cnf=/etc/my.cnf
     ports:
       - 9104:9104
-
-# ["mysqld_exporter", ""]
