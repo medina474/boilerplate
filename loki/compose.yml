@@ -1,3 +1,7 @@
+networks:
+  boilerplate_network:
+    external: true
+
 configs:
   loki_config:
     file: ./local-config.yml
@@ -10,8 +14,8 @@ services:
     container_name: loki
     image: grafana/loki:${LOKI_VERSION}
     command: -config.file=/etc/loki/local-config.yaml
-    depends_on:
-      - minio
+    # depends_on:
+    #   - minio
     configs:
       - source: loki_config
         target: /etc/loki/local-config.yaml
@@ -22,3 +26,7 @@ services:
       - ./data/loki:/loki
     networks:
       - boilerplate_network
+
+  tempo:
+   container_name: tempo
+   image: grafana/tempo:2.4.1
