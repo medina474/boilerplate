@@ -1,4 +1,17 @@
+networks:
+  boilerplate_network:
+    external: true
+
 services:
 
   matomo:
     container_name: matomo
+    image: matomo
+    ports:
+      - 8090:80
+    environment:
+      MATOMO_DATABASE_ADAPTER: mysql
+      MATOMO_DATABASE_HOST: mariadb
+      MATOMO_DATABASE_DBNAME: matomo
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: matomo

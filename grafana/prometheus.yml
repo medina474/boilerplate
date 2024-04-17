@@ -43,6 +43,13 @@ scrape_configs:
       - targets:
           - 'postgres-metrics-exporter:9187'
 
+  - job_name: mariadb
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - 'mysqld-exporter:9104'
+
+
   - job_name: minio
     metrics_path: /minio/v2/metrics/bucket
     scheme: http

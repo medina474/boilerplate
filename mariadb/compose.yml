@@ -5,6 +5,8 @@ networks:
 configs:
   mariadb_initdb:
     file: ./docker-entrypoint-initdb.d
+  exporter_config:
+    file: ./my.cnf
 
 services:
 
@@ -54,6 +56,18 @@ services:
 # https://hub.docker.com/r/prom/mysqld-exporter/
 
   mysqld-exporter:
+    container_name: mariadb_exporter
     image: prom/mysqld-exporter
     networks:
       - boilerplate_network
+    configs:
+      - source: exporter_config
+        target: /etc/my.cnf
+    command:
+      - --mysqld.address=mariadb:3306
+      - --collect.info_schema.tablestats
+      - --config.my-cnf=/etc/my.cnf
+    ports:
+      - 9104:9104
+
+# ["mysqld_exporter", ""]
