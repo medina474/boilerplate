@@ -64,8 +64,6 @@ services:
       - source: exporter_config
         target: /etc/my.cnf
     command:
-      - --mysqld.address=mariadb:3306
-      - --collect.info_schema.tablestats
       - --config.my-cnf=/etc/my.cnf
     ports:
       - 9104:9104
