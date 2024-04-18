@@ -96,9 +96,6 @@ FROM base as final
 ARG POSTGIS_MAJOR=3
 ARG POSTGIS_VERSION=3.4.2+dfsg-1
 
-ARG timescaledb_release=2.9.1
-
-COPY --from=timescaledb-source /tmp/*.deb /tmp/
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -285,23 +282,6 @@ ENV PGDATA /var/lib/postgresql/data
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 VOLUME /var/lib/postgresql/data
 
-
-# Postgis
-# ============================================================
-RUN set -ex; \
-  echo "deb http://deb.debian.org/debian/ testing non-free contrib main" > /etc/apt/sources.list.d/pgdg.list; \
-  apt-get update; \
-  apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR; \
-  apt-get install -y --no-install-recommends \
-    postgresql-${PG_MAJOR}-postgis-${POSTGIS_MAJOR}=${POSTGIS_VERSION} \
-    postgresql-${PG_MAJOR}-postgis-${POSTGIS_MAJOR}-scripts;
-
-# Periods
-# https://github.com/xocolatl/periods
-# ============================================================
-RUN apt-cache showpkg postgresql-16-periods \
-  && apt-get install -y --no-install-recommends \
-  postgresql-16-periods
 
 # ============================================================
 RUN apt-get install /tmp/*.deb -y

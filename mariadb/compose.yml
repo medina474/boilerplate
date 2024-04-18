@@ -67,5 +67,3 @@ services:
         target: /etc/my.cnf
     command:
       - --config.my-cnf=/etc/my.cnf
-    ports:
-      - 9104:9104
