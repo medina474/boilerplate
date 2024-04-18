@@ -1,29 +1,5 @@
 #docker build ./ -t boilerplate/build:2024.04
-FROM debian:testing-slim as base
-
-ARG timescaledb_release=2.13.0
-ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
-
-ARG postgis_release=2.5.0
-ARG postgis_release_checksum=sha256:99a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
-
-ARG pgrouting_release=3.6.2
-ARG pgrouting_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
-
-ARG periods_release=1.2.2
-ARG periods_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
-
-ARG age_release=1.5.0-rc0
-ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
-
-ARG pgvector_release=0.6.2
-ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
-
-ARG libsodium_release=1.0.18
-ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
-
-ARG pgsodium_release=3.1.6
-ARG pgsodium_release_checksum=sha256:f46af33b13ce895b3d8eb2c01c2d5b0b6528eab1e51cd624ddc54daea26e230e
+FROM debian:testing-slim as build-essential
 
 RUN set -eux; \
   apt-get update; \
@@ -32,21 +8,72 @@ RUN set -eux; \
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
-    openssl \
-    gnupg \
-    less \
-    ca-certificates \
-    postgresql-server-dev-16 \
     build-essential \
     cmake \
     checkinstall \
-    ; \
-  rm -rf /var/lib/apt/lists/*;
+  ;
+
+FROM build-essential as build-pgdev
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    postgresql-server-dev-16 \
+  ;
+
+FROM build-essential as base
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    openssl \
+    gnupg \
+    ca-certificates \
+    ;
 
 
 # =============================================================================
+# PostgreSQL
+FROM build-essential as postgresql
+
+ARG postgresql_release=16.2
+ARG postgresql_release_checksum=sha256:2b8201047ec81acd1bad29dba278d788e7891b9c3e8232eda16bb29dec8131c7
+
+ADD --checksum=${postgresql_release_checksum} \
+  "https://ftp.postgresql.org/pub/source/v16.2/postgresql-${postgresql_release}.tar.gz" \
+  /tmp/postgresql.tar.gz
+
+RUN set -eux; \
+  tar -xvf /tmp/postgresql.tar.gz -C /tmp; \
+  rm -rf /tmp/postgresql.tar.gz;
+
+# Installer les dépendances de compilation
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    cmake \
+    checkinstall \
+    pkg-config \
+    bison \
+    flex \
+    libicu-dev \
+    libreadline-dev \
+    libz-dev \
+  ;
+
+ARG PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/
+
+WORKDIR /tmp/postgresql-${postgresql_release}
+
+RUN ./configure; \
+  make -j$(nproc);
+
+# =============================================================================
 # PostGIS
-FROM base as postgis
+FROM build-pgdev as postgis
+
+ARG postgis_release=3.5.0
+ARG postgis_release_checksum=sha256:3982af39fc9f56bed04a0724f99d5130a0e9cb8af7892296f55d02451190cdd9
 
 ADD --checksum=${postgis_release_checksum} \
   "https://postgis.net/stuff/postgis-${postgis_release}dev.tar.gz" \
@@ -56,7 +83,18 @@ RUN set -eux; \
   tar -xvf /tmp/postgis.tar.gz -C /tmp; \
   rm -rf /tmp/postgis.tar.gz;
 
-WORKDIR /tmp/postgis-${pgrouting_release}
+# Installer les dépendances de compilation
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    libgeos-dev \
+    libproj-dev \
+    protobuf-c-compiler \
+    libprotobuf-c-dev \
+    libgdal-dev \
+  ;
+
+WORKDIR /tmp/postgis-${postgis_release}dev
 
 RUN ./configure; \
   make -j$(nproc);
@@ -70,10 +108,10 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # pgRouting étend la base de données géospatiale PostGIS / PostgreSQL pour
 # fournir une fonctionnalité de routage géospatial.
 #
-FROM base as pgrouting
+FROM build-pgdev as pgrouting
 
-ARG pgrouting_release
-ARG pgrouting_release_checksum
+ARG pgrouting_release=3.6.2
+ARG pgrouting_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
 
 ADD --checksum=${pgrouting_release_checksum} \
   "https://github.com/pgRouting/pgrouting/releases/download/v${pgrouting_release}/pgrouting-${pgrouting_release}.tar.gz" \
@@ -83,23 +121,18 @@ RUN set -eux; \
   tar -xvf /tmp/pgrouting.tar.gz -C /tmp; \
   rm -rf /tmp/pgrouting.tar.gz;
 
-# Installer les dépendances pour la compilation
+# Installer les dépendances de compilation
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
     libboost-all-dev \
-  ; \
-  rm -rf /var/lib/apt/lists/*
+  ;
 
 WORKDIR /tmp/pgrouting-${pgrouting_release}/build
 RUN cmake -DBUILD_HTML=OFF -DBUILD_DOXY=OFF ..
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
-
-
-# =============================================================================
-# PostgreSQL
 
 
 # =============================================================================
@@ -110,10 +143,10 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # enregistrement historique des modifications de données dans une table.
 #
 
-FROM base as periods
+FROM build-pgdev as periods
 
-ARG periods_release
-ARG periods_release_checksum
+ARG periods_release=1.2.2
+ARG periods_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
 
 ADD --checksum=${periods_release_checksum} \
   "https://github.com/xocolatl/periods/archive/refs/tags/v${periods_release}.tar.gz" \
@@ -133,9 +166,10 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # =============================================================================
 # TimescaleDB
 
-FROM base as timescaledb
-ARG timescaledb_release
-ARG timescaledb_release_checksum
+FROM build-pgdev as timescaledb
+
+ARG timescaledb_release=2.13.0
+ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
 
 # Download and extract
 ADD --checksum=${timescaledb_release_checksum} \
@@ -149,9 +183,8 @@ RUN set -eux; \
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
-  libkrb5-dev \
-  ; \
-  rm -rf /var/lib/apt/lists/*
+    libkrb5-dev \
+  ;
 
 # Build from source
 WORKDIR /tmp/timescaledb-${timescaledb_release}
@@ -168,10 +201,10 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # Apache Age
 # https://github.com/apache/age
 
-FROM base as age
+FROM build-pgdev as age
 
-ARG age_release
-ARG age_release_checksum
+ARG age_release=1.5.0-rc0
+ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
 
 ADD --checksum=${age_release_checksum} \
   "https://github.com/apache/age/archive/refs/tags/PG16/v${age_release}.tar.gz" \
@@ -184,12 +217,11 @@ RUN set -eux; \
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
-  libreadline-dev \
-  zlib1g-dev \
-  bison \
-  flex \
-  ; \
-  rm -rf /var/lib/apt/lists/*
+    libreadline-dev \
+    zlib1g-dev \
+    bison \
+    flex \
+  ;
 
 WORKDIR /tmp/age-PG16-v${age_release}
 RUN make -j$(nproc)
@@ -206,8 +238,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 
 FROM base as libsodium
 
-ARG libsodium_release
-ARG libsodium_release_checksum
+ARG libsodium_release=1.0.18
+ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
 
 ADD --checksum=${libsodium_release_checksum} \
   "https://download.libsodium.org/libsodium/releases/libsodium-${libsodium_release}.tar.gz" \
@@ -227,8 +259,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 
 FROM libsodium as pgsodium
 
-ARG pgsodium_release
-ARG pgsodium_release_checksum
+ARG pgsodium_release=3.1.6
+ARG pgsodium_release_checksum=sha256:f46af33b13ce895b3d8eb2c01c2d5b0b6528eab1e51cd624ddc54daea26e230e
 
 ADD --checksum=${pgsodium_release_checksum} \
   "https://github.com/michelp/pgsodium/archive/refs/tags/v${pgsodium_release}.tar.gz" \
@@ -237,18 +269,25 @@ ADD --checksum=${pgsodium_release_checksum} \
 RUN tar -xvf /tmp/pgsodium.tar.gz -C /tmp && \
   rm -rf /tmp/pgsodium.tar.gz
 
-  # Build from source
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+    postgresql-server-dev-16 \
+  ;
+
+# Build from source
 WORKDIR /tmp/pgsodium-${pgsodium_release}
 RUN make -j$(nproc)
 
-  # Create debian package
+# Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --requires=libsodium23 --nodoc
 
 # =============================================================================
-FROM base as pgvector
+# pgVector
+FROM build-pgdev as pgvector
 
-ARG pgvector_release
-ARG pgvector_release_checksum
+ARG pgvector_release=0.6.2
+ARG pgvector_release_checksum=sha256:a11cc249a9f3f3d7b13069a1696f2915ac28991a72d7ba4e2bcfdceddbaeae49
 
 ADD --checksum=${pgvector_release_checksum} \
   "https://github.com/pgvector/pgvector/archive/refs/tags/v${pgvector_release}.tar.gz" \
@@ -269,15 +308,31 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 #
 FROM debian:testing-slim as production
 
-# Copier les packages des différents images
+RUN set -eux; \
+	groupadd -r postgres --gid=999; \
+	useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
+	mkdir -p /var/lib/postgresql; \
+	chown -R postgres:postgres /var/lib/postgresql
+
+# Copier les packages des différentes images
 COPY --from=timescaledb /tmp/*.deb /tmp
 COPY --from=age /tmp/*.deb /tmp
 COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
+COPY --from=postgis /tmp/*.deb /tmp
+COPY --from=postgresql /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install /tmp/*.deb -y;
+
+RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 3777 /var/run/postgresql
+
+ENV PGDATA /var/lib/postgresql/data
+RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
+VOLUME /var/lib/postgresql/data
+
+RUN mkdir /docker-entrypoint-initdb.d
 
 CMD tail -f /dev/null
