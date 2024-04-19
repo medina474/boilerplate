@@ -1,17 +1,22 @@
+networks:
+  boilerplate_network:
+    external: true
+
 services:
   portainer:
-    image: portainer/portainer-ce:${PORTAINER_VERSION}
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.20.1-alpine}
     container_name: portainer
-    command: -H unix:///var/run/docker.sock
-    ports:
-      - 9000:9000
+    command: -H unix:///var/run/docker.sock --admin-password '$$2y$$10$$DtuHkrmVGrE734LWmN9aEu81YWeYXHfASL0d6XKuXmBWpskS4jNOO'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
     restart: always
+    networks:
+      - boilerplate_network
     labels:
       traefik.enable: true
-      traefik.http.routers.smtp4dev.entrypoints: websecure
-      traefik.http.routers.smtp4dev.tls: true
-      traefik.http.routers.smtp4dev.rule: ${PORTAINER_TRAEFIK_RULE}
-      traefik.http.services.smtp4dev.loadbalancer.server.port: 9000
+      traefik.http.routers.portainer.entrypoints: websecure
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.rule: ${PORTAINER_TRAEFIK_RULE}
+      traefik.http.services.portainer.loadbalancer.server.port: 9000
+      traefik.http.routers.portainer.middlewares: strip-prefix

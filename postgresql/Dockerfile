@@ -335,4 +335,13 @@ VOLUME /var/lib/postgresql/data
 
 RUN mkdir /docker-entrypoint-initdb.d
 
-CMD tail -f /dev/null
+HEALTHCHECK --interval=2s --timeout=2s --retries=10 CMD pg_isready -U postgres -h localhost
+
+COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+STOPSIGNAL SIGINT
+
+EXPOSE 5432
+CMD ["postgres", "-D", "/etc/postgresql"]

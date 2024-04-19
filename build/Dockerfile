@@ -1,5 +1,5 @@
 #docker build ./ -t boilerplate/build:2024.04
-FROM debian:testing-slim as build-essential
+FROM debian:testing-slim
 
 RUN set -eux; \
   apt-get update; \
