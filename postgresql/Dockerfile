@@ -1,4 +1,4 @@
-#docker build ./ -t boilerplate/build:2024.04
+#docker build ./ -t boilerplate/postgresql:2024.04
 FROM debian:testing-slim as build-essential
 
 RUN set -eux; \
@@ -20,17 +20,6 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   postgresql-server-dev-16 \
   ;
-
-FROM build-essential as base
-
-RUN set -eux; \
-  apt-get update; \
-  apt-get install -y --no-install-recommends \
-  openssl \
-  gnupg \
-  ca-certificates \
-  ;
-
 
 # =============================================================================
 # PostgreSQL
@@ -67,6 +56,9 @@ WORKDIR /tmp/postgresql-${postgresql_release}
 
 RUN ./configure; \
   make -j$(nproc);
+
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=postgresql --pkgversion=${postgresql_release} --nodoc
 
 # =============================================================================
 # PostGIS
@@ -236,7 +228,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # utilisant la bibliothèque libsodium pour les algorithmes cryptographiques
 # de haut niveau.
 
-FROM base as libsodium
+FROM build-essential as libsodium
 
 ARG libsodium_release=1.0.18
 ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
@@ -310,22 +302,39 @@ FROM debian:testing-slim as production
 
 RUN set -eux; \
   groupadd -r postgres --gid=999; \
-  useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
+  useradd -r -g postgres --uid=999 \
+    --home-dir=/var/lib/postgresql \
+    --shell=/bin/bash postgres; \
   mkdir -p /var/lib/postgresql; \
-  chown -R postgres:postgres /var/lib/postgresql
+  chown -R postgres:postgres /var/lib/postgresql;
+
+# make the "fr_FR.UTF-8" locale so postgres will be utf-8 enabled by default
+RUN set -eux; \
+	if [ -f /etc/dpkg/dpkg.cfg.d/docker ]; then \
+# if this file exists, we're likely in "debian:xxx-slim", and locales are thus being excluded so we need to remove that exclusion (since we need locales)
+		grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
+		sed -ri '/\/usr\/share\/locale/d' /etc/dpkg/dpkg.cfg.d/docker; \
+		! grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
+	fi; \
+	apt-get update; apt-get install -y --no-install-recommends locales; rm -rf /var/lib/apt/lists/*; \
+	echo 'fr_FR.UTF-8 UTF-8' >> /etc/locale.gen; \
+	locale-gen; \
+	locale -a | grep 'fr_FR.utf8'
+ENV LANG fr_FR.utf8
+
+ADD --chmod=755 \
+  https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 \
+  /usr/local/bin/gosu
 
 # Copier les packages des différentes images
+COPY --from=postgresql /tmp/*.deb /tmp
+COPY --from=postgis /tmp/*.deb /tmp
+COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=timescaledb /tmp/*.deb /tmp
 COPY --from=age /tmp/*.deb /tmp
-COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
-COPY --from=postgis /tmp/*.deb /tmp
-COPY --from=postgresql /tmp/*.deb /tmp
-
-RUN set -eux; \
-  apt-get install /tmp/*.deb -y;
 
 RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 3777 /var/run/postgresql
 
@@ -333,15 +342,34 @@ ENV PGDATA /var/lib/postgresql/data
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 VOLUME /var/lib/postgresql/data
 
+RUN set -eux; \
+  apt-get install \
+    /tmp/postgresql_*.deb \
+    /tmp/postgis_*.deb \
+    /tmp/pgrouting_*.deb \
+    /tmp/periods_*.deb \
+    /tmp/pgvector_*.deb \
+  -y;
+
 RUN mkdir /docker-entrypoint-initdb.d
 
 HEALTHCHECK --interval=2s --timeout=2s --retries=10 CMD pg_isready -U postgres -h localhost
 
-COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+ADD --chmod=0755 \
+  https://github.com/docker-library/postgres/raw/master/16/bookworm/docker-entrypoint.sh \
+  /usr/local/bin/
+
+ADD --chmod=0755 \
+  https://github.com/docker-library/postgres/raw/master/16/bookworm/docker-ensure-initdb.sh \
+  /usr/local/bin/
+
+
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 STOPSIGNAL SIGINT
 
 EXPOSE 5432
-CMD ["postgres", "-D", "/etc/postgresql"]
+#CMD ["postgres", "-D", "/etc/postgresql"]
+CMD ["tail", "-f", "/dev/null"]
