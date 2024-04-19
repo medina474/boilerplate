@@ -2,4 +2,17 @@
 GET http://localhost:6379/metrics
 
 ###
-GET http://localhost:6379/
+GET http://localhost:7379/PING
+
+###
+GET http://127.0.0.1:7379/SET/test/42
+
+
+###
+GET http://127.0.0.1:7379/GET/test
+
+###
+GET http://127.0.0.1:7379/INCR/test
+
+###
+GET http://127.0.0.1:7379/TYPE/test
