@@ -15,3 +15,13 @@ services:
       - boilerplate_network
     volumes:
       - ./data:/data
+
+  webdis:
+    container_name: webdis
+    image: nextcloud/webdis:2024.04
+    build:
+      context: .
+    networks:
+      - boilerplate_network
+    ports:
+      - 7379:7379
