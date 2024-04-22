@@ -297,6 +297,29 @@ RUN make -j$(nproc)
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 
 # =============================================================================
+# postgresql-anonymizer
+FROM build-pgdev as pganon
+
+ARG anon_release=1.3.2
+ARG anon_release_checksum=sha256:4a7238e71cf6ea4cf492cdc4bd3fd9b76bbdc4053d5dd696ba3fe1fa2ab3c318
+
+ADD --checksum=${anon_release_checksum} \
+  "https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anon_release}/postgresql_anonymizer-${anon_release}.tar.gz" \
+  /tmp/anon.tar.gz
+
+  RUN mkdir /tmp/anon && \
+  tar -xvf /tmp/anon.tar.gz -C /tmp && \
+  rm -rf /tmp/anon.tar.gz
+
+# edit make to french data
+
+WORKDIR /tmp/postgresql_anonymizer-1.3.2
+RUN make -j$(nproc)
+
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
+
+# =============================================================================
 # Image finale de production
 #
 FROM debian:bookworm-slim as production
@@ -493,17 +516,18 @@ VOLUME /var/lib/postgresql/data
 COPY --from=postgis /tmp/*.deb /tmp
 COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=timescaledb /tmp/*.deb /tmp
-COPY --from=age /tmp/*.deb /tmp
+COPY --from=age /tmp /tmp
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
+COPY --from=pganon /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install \
     /tmp/*.deb \
   -y;
 
-
+RUN echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample
 
 # Entrypoint
 

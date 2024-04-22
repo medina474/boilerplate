@@ -39,7 +39,8 @@ services:
     image: quay.io/prometheuscommunity/postgres-exporter
     container_name: prometheus-exporter
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     networks:
       - boilerplate_network
     ports:
@@ -51,7 +52,8 @@ services:
     container_name: pgadmin
     image: dpage/pgadmin4:${PGADMIN_VERSION:-8.4}
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     restart: no
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
@@ -76,7 +78,8 @@ services:
     container_name: postgrest
     image: postgrest/postgrest:${POSTGREST_VERSION:-v12.0.1}
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     environment:
       PGRST_DB_URI: postgres://${POSTGREST_USER}:${POSTGREST_PASSWORD}@${POSTGREST_HOST}:${POSTGREST_DB_PORT:-5432}/${POSTGREST_DB}
       PGRST_DB_SCHEMAS: ${POSTGREST_DB_SCHEMAS:-public}
@@ -120,7 +123,8 @@ services:
     build:
       context: ./postgraphile
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     environment:
       - PGHOST=${POSTGRAPHILE_HOST}
       - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
