@@ -11,7 +11,7 @@ configs:
 services:
 
   postgresql:
-    image: boilerplate/postgresql:2024.03
+    image: boilerplate/postgresql:${POSTGRES_VERSION}
     container_name: postgresql
     build:
       context: .
@@ -115,7 +115,7 @@ services:
       traefik.http.routers.redocly.middlewares: strip-prefix
 
   postgraphile:
-    image: boilerplate/postgraphile:2024.03
+    image: boilerplate/postgraphile:2024.04
     container_name: postgraphile
     build:
       context: ./postgraphile
@@ -149,8 +149,10 @@ services:
       traefik.http.routers.postgraphile.middlewares: strip-prefix
 
   age_viewer:
-    image: boilerplate/age_viewer:2024.03
+    image: boilerplate/age_viewer:2024.04
     container_name: age_viewer
+    depends_on:
+      - postgresql
     tty: true
     build:
       context: ./age-viewer
