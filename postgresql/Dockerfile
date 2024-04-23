@@ -93,7 +93,10 @@ RUN ./configure; \
   make -j$(nproc);
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=postgis --pkgversion=${postgis_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --requires=libgeos-c1v5,libproj15,libjson-c4,libprotobuf-c1,libgdal26 \
+  --pkgname=postgis --pkgversion=${postgis_release} \
+  --nodoc
 
 # =============================================================================
 # pgRouting
@@ -125,7 +128,9 @@ WORKDIR /tmp/pgrouting-${pgrouting_release}/build
 RUN cmake -DBUILD_HTML=OFF -DBUILD_DOXY=OFF ..
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=pgrouting --pkgversion=${pgrouting_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=pgrouting --pkgversion=${pgrouting_release} \
+  --nodoc
 
 
 # =============================================================================
@@ -153,7 +158,9 @@ WORKDIR /tmp/periods-${periods_release}
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=periods --pkgversion=${periods_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=periods --pkgversion=${periods_release} \
+  --nodoc
 
 
 # =============================================================================
@@ -187,7 +194,9 @@ WORKDIR /tmp/timescaledb-${timescaledb_release}/build
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=timescaledb --pkgversion=${timescaledb_release} --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=timescaledb --pkgversion=${timescaledb_release} \
+  --nodoc
 
 
 # =============================================================================
@@ -220,7 +229,9 @@ WORKDIR /tmp/age-PG16-v${age_release}
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=age --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=age \
+  --nodoc
 
 # =============================================================================
 # pgSodium
@@ -248,7 +259,9 @@ RUN ./configure; \
   make install;
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=libsodium23 --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=libsodium23 \
+  --nodoc
 
 FROM libsodium as pgsodium
 
@@ -273,7 +286,9 @@ WORKDIR /tmp/pgsodium-${pgsodium_release}
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --requires=libsodium23 --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --requires=libsodium23 \
+  --nodoc
 
 # =============================================================================
 # pgVector
@@ -294,7 +309,8 @@ WORKDIR /tmp/pgvector-${pgvector_release}
 RUN make -j$(nproc)
 
 # Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --nodoc
 
 # =============================================================================
 # postgresql-anonymizer
@@ -307,7 +323,7 @@ ADD --checksum=${anon_release_checksum} \
   "https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anon_release}/postgresql_anonymizer-${anon_release}.tar.gz" \
   /tmp/anon.tar.gz
 
-  RUN mkdir /tmp/anon && \
+RUN mkdir /tmp/anon && \
   tar -xvf /tmp/anon.tar.gz -C /tmp && \
   rm -rf /tmp/anon.tar.gz
 
@@ -315,6 +331,10 @@ ADD --checksum=${anon_release_checksum} \
 
 WORKDIR /tmp/postgresql_anonymizer-1.3.2
 RUN make -j$(nproc)
+
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --nodoc
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
