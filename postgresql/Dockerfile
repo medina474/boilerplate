@@ -336,6 +336,27 @@ RUN make -j$(nproc)
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
   --nodoc
 
+
+# =============================================================================
+# pgCron
+#
+FROM build-pgdev as pgcron
+
+# Download and extract
+ARG pg_cron_release=1.6.2
+ARG pg_cron_release_checksum=sha256:9f4eb3193733c6fa93a6591406659aac54b82c24a5d91ffaf4ec243f717d94a0
+
+ADD --checksum=${pg_cron_release_checksum} \
+    "https://github.com/citusdata/pg_cron/archive/refs/tags/v${pg_cron_release}.tar.gz" \
+    /tmp/pg_cron.tar.gz
+
+RUN tar -xvf /tmp/pg_cron.tar.gz -C /tmp && \
+    rm -rf /tmp/pg_cron.tar.gz
+
+# Build from source
+WORKDIR /tmp/pg_cron-${pg_cron_release}
+RUN make -j$(nproc)
+
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 
@@ -541,6 +562,7 @@ COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
 COPY --from=pganon /tmp/*.deb /tmp
+#COPY --from=pgcron /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get install \
