@@ -62,8 +62,41 @@ RUN ./configure; \
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgname=postgresql --pkgversion=${postgresql_release} --nodoc
 
 # =============================================================================
+# sfcgal
+#
+FROM build-pgdev as sfcgal
+
+# Download and extract
+ARG sfcgal_release=1.5.1
+ARG sfcgal_release_checksum
+
+ADD --checksum=${sfcgal_release_checksum} \
+    "https://gitlab.com/sfcgal/SFCGAL/-/archive/v${sfcgal_release}/SFCGAL-v${sfcgal_release}.tar.gz" \
+    /tmp/sfcgal.tar.gz
+
+RUN tar -xvf /tmp/sfcgal.tar.gz -C /tmp --one-top-level --strip-components 1 && \
+    rm -rf /tmp/sfcgal.tar.gz
+
+ # Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcgal-dev \
+    libboost-serialization1.83-dev \
+    libmpfr-dev \
+    libgmp-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+    # Build from source
+WORKDIR /tmp/sfcgal/build
+RUN cmake .. && make -j1
+
+# Create debian package
+RUN checkinstall -D --install=yes --fstrans=no --backup=no --pakdir=/tmp --pkgname=sfcgal --pkgversion=${sfcgal_release} \
+  --requires=libgmpxx4ldbl,libboost-serialization1.83.0,libmpfr6 --nodoc
+
+
+# =============================================================================
 # PostGIS
-FROM build-pgdev as postgis
+FROM sfcgal as postgis
 
 ARG postgis_release=3.5.0
 ARG postgis_release_checksum=sha256:3982af39fc9f56bed04a0724f99d5130a0e9cb8af7892296f55d02451190cdd9
@@ -88,13 +121,12 @@ RUN set -eux; \
   ;
 
 WORKDIR /tmp/postgis-${postgis_release}dev
-
-RUN ./configure; \
+RUN ./configure --with-sfcgal; \
   make -j$(nproc);
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
-  --requires=libgeos-c1v5,libproj15,libjson-c4,libprotobuf-c1,libgdal26 \
+  --requires=libgeos-c1v5,libproj25,libjson-c5,libprotobuf-c1,libgdal34 \
   --pkgname=postgis --pkgversion=${postgis_release} \
   --nodoc
 
@@ -358,7 +390,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 # =============================================================================
 # Image finale de production
 #
-FROM debian:bookworm-slim as production
+FROM debian:testing-slim as production
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -558,6 +590,15 @@ COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
 COPY --from=pganon /tmp/*.deb /tmp
 #COPY --from=pgcron /tmp/*.deb /tmp
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install \
+    libgeos-c1v5 \
+    libjson-c5 \
+    libgdal34 \
+    libboost-serialization1.83.0 \
+  -y;
 
 RUN set -eux; \
   apt-get install \
