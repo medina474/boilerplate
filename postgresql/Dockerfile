@@ -226,12 +226,7 @@ RUN set -eux; \
   ;
 
 WORKDIR /tmp/age-PG16-v${age_release}
-RUN make -j$(nproc)
-
-# Create debian package
-RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
-  --pkgname=age \
-  --nodoc
+RUN make -j$(nproc) install
 
 # =============================================================================
 # pgSodium
@@ -557,7 +552,7 @@ VOLUME /var/lib/postgresql/data
 COPY --from=postgis /tmp/*.deb /tmp
 COPY --from=pgrouting /tmp/*.deb /tmp
 COPY --from=timescaledb /tmp/*.deb /tmp
-COPY --from=age /tmp /tmp
+COPY --from=age /usr/share/postgresql/16/extension/ /usr/share/postgresql/16/extension/
 COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
