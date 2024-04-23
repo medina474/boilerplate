@@ -589,7 +589,7 @@ COPY --from=periods /tmp/*.deb /tmp
 COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
 COPY --from=pganon /tmp/*.deb /tmp
-#COPY --from=pgcron /tmp/*.deb /tmp
+COPY --from=pgcron /tmp/*.deb /tmp
 
 RUN set -eux; \
   apt-get update; \
@@ -652,7 +652,6 @@ STOPSIGNAL SIGINT
 # documentation at https://www.postgresql.org/docs/12/server-start.html notes
 # that even 90 seconds may not be long enough in many instances.
 
-HEALTHCHECK --interval=2s --timeout=2s --retries=10 CMD pg_isready -U postgres -h localhost
 
 EXPOSE 5432
 CMD ["postgres"]
