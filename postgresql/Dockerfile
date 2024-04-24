@@ -63,10 +63,14 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 
 # =============================================================================
 # sfcgal
-#
+# SFCGAL est une bibliothèque wrapper C++ autour de CGAL qui fournit des types
+# de géométrie et des opérations 3D conformes aux normes ISO 19107:2013 et
+# OGC Simple Features Access 1.2.
+# PostGIS utilise l'API C pour exposer certaines fonctions de SFCGAL dans
+# des bases de données spatiales
 FROM build-pgdev as sfcgal
 
-# Download and extract
+# Télécharger
 ARG sfcgal_release=1.5.1
 ARG sfcgal_release_checksum
 
@@ -74,6 +78,7 @@ ADD --checksum=${sfcgal_release_checksum} \
     "https://gitlab.com/sfcgal/SFCGAL/-/archive/v${sfcgal_release}/SFCGAL-v${sfcgal_release}.tar.gz" \
     /tmp/sfcgal.tar.gz
 
+# Extraire
 RUN tar -xvf /tmp/sfcgal.tar.gz -C /tmp --one-top-level --strip-components 1 && \
     rm -rf /tmp/sfcgal.tar.gz
 
@@ -85,7 +90,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgmp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-    # Build from source
+# Build from source
 WORKDIR /tmp/sfcgal/build
 RUN cmake .. && make -j1
 
@@ -369,7 +374,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 #
 FROM build-pgdev as pgcron
 
-# Download and extract
+# Télécharger
 ARG pg_cron_release=1.6.2
 ARG pg_cron_release_checksum=sha256:9f4eb3193733c6fa93a6591406659aac54b82c24a5d91ffaf4ec243f717d94a0
 
@@ -377,6 +382,7 @@ ADD --checksum=${pg_cron_release_checksum} \
     "https://github.com/citusdata/pg_cron/archive/refs/tags/v${pg_cron_release}.tar.gz" \
     /tmp/pg_cron.tar.gz
 
+# Extraire
 RUN tar -xvf /tmp/pg_cron.tar.gz -C /tmp && \
     rm -rf /tmp/pg_cron.tar.gz
 
@@ -386,6 +392,37 @@ RUN make -j$(nproc)
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
+
+# =============================================================================
+# Apache MADlib
+#
+FROM build-pgdev as madlib
+
+# Télécharger
+ARG madlib_release=2.1.0
+ARG madlib_release_checksum=sha256:41a46a31a877f411bded38a26afb302bccfadf8152913d8268124e474d21fe3a
+
+ADD "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz" \
+    /tmp/m4.tar.gz
+
+# Extraire
+RUN tar -xvf /tmp/m4.tar.gz -C /tmp && \
+    rm -rf /tmp/m4.tar.gz
+
+WORKDIR /tmp/m4-1.4.19
+RUN ./configure --prefix=/usr/local/m4 && make && make install
+
+ADD --checksum=${madlib_release_checksum} \
+    "https://dist.apache.org/repos/dist/release/madlib/${madlib_release}/apache-madlib-${madlib_release}-src.tar.gz" \
+    /tmp/madlib.tar.gz
+
+# Extraire
+RUN tar -xvf /tmp/madlib.tar.gz -C /tmp && \
+    rm -rf /tmp/madlib.tar.gz
+
+# Build from source
+WORKDIR /tmp/apache-madlib-${madlib_release}-src/build
+RUN cmake .. && make -j$(nproc)
 
 # =============================================================================
 # Image finale de production
@@ -590,6 +627,7 @@ COPY --from=pgvector /tmp/*.deb /tmp
 COPY --from=pgsodium /tmp/*.deb /tmp
 COPY --from=pganon /tmp/*.deb /tmp
 COPY --from=pgcron /tmp/*.deb /tmp
+COPY --from=madlib /tmp /tmp
 
 RUN set -eux; \
   apt-get update; \
@@ -603,7 +641,8 @@ RUN set -eux; \
 RUN set -eux; \
   apt-get install \
     /tmp/*.deb \
-  -y;
+  -y; \
+  rm /tmp/*.deb;
 
 RUN echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample
 
@@ -652,6 +691,7 @@ STOPSIGNAL SIGINT
 # documentation at https://www.postgresql.org/docs/12/server-start.html notes
 # that even 90 seconds may not be long enough in many instances.
 
+HEALTHCHECK --interval=5s --timeout=2s --retries=10 CMD pg_isready -U postgres -h localhost
 
 EXPOSE 5432
 CMD ["postgres"]
