@@ -95,7 +95,8 @@ WORKDIR /tmp/sfcgal/build
 RUN cmake .. && make -j1
 
 # Create debian package
-RUN checkinstall -D --install=yes --fstrans=no --backup=no --pakdir=/tmp --pkgname=sfcgal --pkgversion=${sfcgal_release} \
+RUN checkinstall -D --install=yes --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=sfcgal --pkgversion=${sfcgal_release} \
   --requires=libgmpxx4ldbl,libboost-serialization1.83.0,libmpfr6 --nodoc
 
 
@@ -399,18 +400,21 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 FROM build-pgdev as madlib
 
 # Télécharger
-ARG madlib_release=2.1.0
-ARG madlib_release_checksum=sha256:41a46a31a877f411bded38a26afb302bccfadf8152913d8268124e474d21fe3a
+ARG m4_release=1.4.19
 
-ADD "https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz" \
-    /tmp/m4.tar.gz
+ADD "https://ftp.gnu.org/gnu/m4/m4-${m4_release}.tar.gz" \
+/tmp/m4.tar.gz
 
 # Extraire
 RUN tar -xvf /tmp/m4.tar.gz -C /tmp && \
-    rm -rf /tmp/m4.tar.gz
+rm -rf /tmp/m4.tar.gz
 
-WORKDIR /tmp/m4-1.4.19
+WORKDIR /tmp/m4-${m4_release}
 RUN ./configure --prefix=/usr/local/m4 && make && make install
+
+# Télécharger
+ARG madlib_release=2.1.0
+ARG madlib_release_checksum=sha256:41a46a31a877f411bded38a26afb302bccfadf8152913d8268124e474d21fe3a
 
 ADD --checksum=${madlib_release_checksum} \
     "https://dist.apache.org/repos/dist/release/madlib/${madlib_release}/apache-madlib-${madlib_release}-src.tar.gz" \
@@ -420,9 +424,20 @@ ADD --checksum=${madlib_release_checksum} \
 RUN tar -xvf /tmp/madlib.tar.gz -C /tmp && \
     rm -rf /tmp/madlib.tar.gz
 
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+  libboost-system-dev \
+  ;
+
 # Build from source
 WORKDIR /tmp/apache-madlib-${madlib_release}-src/build
-RUN cmake .. && make -j$(nproc)
+RUN PATH=$PATH:/usr/local/m4/bin && cmake .. && make -j$(nproc)
+
+# Create debian package
+RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
+  --pkgname=madlib --pkgversion=${madlib_release} \
+  --nodoc
 
 # =============================================================================
 # Image finale de production
@@ -636,7 +651,10 @@ RUN set -eux; \
     libjson-c5 \
     libgdal34 \
     libboost-serialization1.83.0 \
+    python3 python3-yaml \
   -y;
+
+# /tmp/apache-madlib-2.1.0-src/build/src/bin/madpack -s madlib -p postgres -c postgres/supermotdepasse@localhost install-check
 
 RUN set -eux; \
   apt-get install \
