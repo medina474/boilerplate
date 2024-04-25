@@ -10,6 +10,7 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
+	python3 \
   ;
 
 # =============================================================================
@@ -25,10 +26,13 @@ ADD "https://ftp.gnu.org/gnu/m4/m4-${m4_release}.tar.gz" \
 
 # Extraire
 RUN tar -xvf /tmp/m4.tar.gz -C /tmp && \
-rm -rf /tmp/m4.tar.gz
+  rm -rf /tmp/m4.tar.gz
 
 WORKDIR /tmp/m4-${m4_release}
-RUN ./configure --prefix=/usr/local/m4 && make && make install
+RUN ./configure --prefix=/usr/local/m4 && \
+  make && \
+  make install && \
+  PATH=$PATH:/usr/local/m4/bin
 
 # Télécharger
 ARG madlib_release=2.1.0
@@ -45,12 +49,13 @@ RUN tar -xvf /tmp/madlib.tar.gz -C /tmp && \
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
-  libboost-system-dev \
+    libboost-system-dev \
   ;
 
 # Build from source
 WORKDIR /tmp/apache-madlib-${madlib_release}-src/build
-RUN PATH=$PATH:/usr/local/m4/bin && cmake .. && make -j$(nproc)
+RUN cmake .. && \
+	make -j$(nproc)
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
