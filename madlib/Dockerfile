@@ -1,4 +1,4 @@
-#docker build ./ -t boilerplate/postgresqlmadlib:2024.04
+#docker build ./ -t boilerplate/madlib:2024.04
 FROM debian:testing-slim as build-essential
 
 RUN set -eux; \
@@ -10,6 +10,7 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
+  checkinstall \
 	python3 \
   ;
 
@@ -31,8 +32,7 @@ RUN tar -xvf /tmp/m4.tar.gz -C /tmp && \
 WORKDIR /tmp/m4-${m4_release}
 RUN ./configure --prefix=/usr/local/m4 && \
   make && \
-  make install && \
-  PATH=$PATH:/usr/local/m4/bin
+  make install
 
 # Télécharger
 ARG madlib_release=2.1.0
@@ -54,7 +54,8 @@ RUN set -eux; \
 
 # Build from source
 WORKDIR /tmp/apache-madlib-${madlib_release}-src/build
-RUN cmake .. && \
+RUN PATH=$PATH:/usr/local/m4/bin && \
+  cmake .. && \
 	make -j$(nproc)
 
 # Create debian package
@@ -259,11 +260,10 @@ COPY --from=madlib /tmp /tmp
 RUN set -eux; \
   apt-get update; \
   apt-get install \
-    python3 \ 
+    python3 \
 		python3-yaml \
+    /tmp/*.deb \
   -y;
-
-#RUN /tmp/apache-madlib-2.1.0-src/build/src/bin/madpack -s madlib -p postgres -c postgres/supermotdepasse@localhost install-check
 
 # Entrypoint
 
@@ -310,7 +310,8 @@ STOPSIGNAL SIGINT
 # documentation at https://www.postgresql.org/docs/12/server-start.html notes
 # that even 90 seconds may not be long enough in many instances.
 
-HEALTHCHECK --interval=5s --timeout=2s --retries=10 CMD pg_isready -U postgres -h localhost
+HEALTHCHECK --interval=5s --timeout=2s --retries=10 \
+  CMD pg_isready -U postgres -h localhost
 
 EXPOSE 5432
 CMD ["postgres"]
