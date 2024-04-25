@@ -30,7 +30,8 @@ RUN set -eux; \
   apt-get install -y \
     libzip-dev \
     ; \
-    docker-php-ext-install zip;
+    docker-php-ext-install -j$(nproc) zip; \
+    docker-php-ext-install -j$(nproc) opcache; \
 
 # GD
 RUN set -eux; \
@@ -51,7 +52,7 @@ RUN set -eux; \
   apt-get install -y \
   ; \
   docker-php-ext-configure pdo_mysql; \
-  docker-php-ext-install pdo_mysql;
+  docker-php-ext-install -j$(nproc) pdo_mysql;
 
 RUN set -eux; \
   apt-get -y update; \
@@ -59,11 +60,13 @@ RUN set -eux; \
     libicu-dev \
   ; \
   docker-php-ext-configure intl; \
-  docker-php-ext-install intl;
+  docker-php-ext-install -j$(nproc) intl;
 
 # Clean up
-RUN apt-get remove -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
+RUN set -eux; \
+  apt-get autoremove -y; \
+  apt-get clean; \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*;
 
 # Change owner and group
 USER nextcloud:nextcloud

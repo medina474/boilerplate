@@ -443,7 +443,7 @@ RUN set -ex; \
 # 	gosu --version; \
 # 	gosu nobody true
 
-ADD --chmod=755 \
+ADD --chmod=0755 \
   https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 \
   /usr/local/bin/gosu
 
