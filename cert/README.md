@@ -128,7 +128,7 @@ subjectAltName = @alt_names
 
 [ alt_names ]
 DNS.1 = localhost
-DNS.2 = boilerplate.docker.org
+DNS.2 = *.docker.org
 IP.1 = 192.168.1.19
 ```
 
