@@ -32,18 +32,25 @@ RUN set -eux; \
     ; \
     docker-php-ext-install zip;
 
-    RUN set -eux; \
-    apt-get update; \
-    apt-get install -y \
+# GD
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y \
     libjpeg-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
     libwebp-dev \
-    libxpm-dev \
     libfreetype6-dev \
-    ; \
-  docker-php-ext-configure gd --with-jpeg --with-xpm --with-webp --with-freetype; \
+  ; \
+  docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype; \
   docker-php-ext-install -j$(nproc) gd;
+
+# PDO MySQL / MariaDB
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y \
+  ; \
+  docker-php-ext-install pdo_mysql;
 
 # Clean up
 RUN apt-get remove -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
