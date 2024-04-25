@@ -81,3 +81,10 @@ services:
       traefik.http.routers.alertmanager.entrypoints: web
       traefik.http.routers.alertmanager.rule: ${ALERTMANAGER_TRAEFIK_RULE}
       traefik.http.services.alertmanager.loadbalancer.server.port: ${ALERTMANAGER_PORT}
+
+# https://gitlab.com/rsrchboy/prometheus-docker-discovery
+#  docker-discovery:
+#    container_name: docker-discovery
+#    image: registry.gitlab.com/rsrchboy/prometheus-docker-discovery:latest
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro

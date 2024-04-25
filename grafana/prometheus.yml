@@ -59,7 +59,6 @@ scrape_configs:
       - targets:
           - 'mysqld-exporter:9104'
 
-
   - job_name: minio
     metrics_path: /minio/v2/metrics/bucket
     scheme: http

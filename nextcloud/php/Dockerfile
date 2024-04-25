@@ -16,6 +16,7 @@ RUN sed -i \
     -e 's/^group = www-data*/group = nextcloud/' \
     -e 's/^;listen.owner = www-data*/listen.owner = nextcloud/' \
     -e 's/^;listen.group = www-data*/listen.group = nextcloud/' \
+    -e 's/^;pm.status_path = \/status*/pm.status_path = \/status/' \
     /usr/local/etc/php-fpm.d/www.conf
 
 # Create users, directories and update permissions
@@ -32,6 +33,7 @@ RUN set -eux; \
     ; \
     docker-php-ext-install -j$(nproc) zip; \
     docker-php-ext-install -j$(nproc) opcache; \
+    docker-php-ext-install -j$(nproc) shmop;
 
 # GD
 RUN set -eux; \
