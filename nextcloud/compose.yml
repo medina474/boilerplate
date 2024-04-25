@@ -12,7 +12,7 @@ services:
     networks:
       - boilerplate_network
     volumes:
-      - ./data:/var/www/html
+      - ./nextcloud:/var/www/html
     labels:
       traefik.enable: true
       traefik.http.routers.nextcloud.entrypoints: websecure
@@ -28,4 +28,4 @@ services:
     networks:
       - boilerplate_network
     volumes:
-      - ./data:/var/www/html
+      - ./nextcloud:/var/www/html
