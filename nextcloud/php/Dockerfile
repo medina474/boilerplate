@@ -50,7 +50,16 @@ RUN set -eux; \
   apt-get update; \
   apt-get install -y \
   ; \
+  docker-php-ext-configure pdo_mysql; \
   docker-php-ext-install pdo_mysql;
+
+RUN set -eux; \
+  apt-get -y update; \
+  apt-get install -y \
+    libicu-dev \
+  ; \
+  docker-php-ext-configure intl; \
+  docker-php-ext-install intl;
 
 # Clean up
 RUN apt-get remove -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

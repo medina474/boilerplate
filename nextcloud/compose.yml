@@ -1,3 +1,7 @@
+networks:
+  boilerplate_network:
+    external: true
+
 services:
 
   apache:
@@ -5,8 +9,8 @@ services:
     image: nextcloud/apache:2024.04
     build:
       context: ./apache
-    ports:
-      - 8000:80
+    networks:
+      - boilerplate_network
     volumes:
       - ./data:/var/www/html
     labels:
@@ -21,5 +25,7 @@ services:
     image: nextcloud/php:2024.04
     build:
       context: ./php
+    networks:
+      - boilerplate_network
     volumes:
       - ./data:/var/www/html
