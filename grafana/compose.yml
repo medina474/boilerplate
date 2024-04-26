@@ -10,6 +10,11 @@ configs:
   alertmanager_config:
     file: ./alertmanager
 
+volumes:
+  grafana_volume:
+  prometheus_volume:
+  alertmanager_volume:
+
 services:
 
   grafana:
@@ -25,7 +30,7 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - grafana_volume:/var/lib/grafana
     networks:
       - boilerplate_network
     environment:
@@ -42,7 +47,9 @@ services:
 
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.51.0}
+    image: boilerplate/prometheus:${PROMETHEUS_VERSION:-v2.51.0}
+    build:
+      context: .
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.external-url=/prometheus/'
@@ -50,12 +57,14 @@ services:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
     volumes:
-      - ./data/prometheus:/prometheus
+      - prometheus_volume:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - boilerplate_network
     ports:
       - ${PROMETHEUS_PORT}:9090
+    extra_hosts:
+      - host.docker.internal=host-gateway
     labels:
       traefik.enable: true
       traefik.http.routers.prometheus.entrypoints: websecure
@@ -75,7 +84,7 @@ services:
     networks:
       - boilerplate_network
     volumes:
-      - ./data/alertmanager:/alertmanager
+      - alertmanager_volume:/alertmanager
     labels:
       traefik.enable: true
       traefik.http.routers.alertmanager.entrypoints: web
