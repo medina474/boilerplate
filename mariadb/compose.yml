@@ -62,8 +62,12 @@ services:
     image: prom/mysqld-exporter
     networks:
       - boilerplate_network
+    ports:
+      - 9104:9104
     configs:
       - source: exporter_config
         target: /etc/my.cnf
     command:
       - --config.my-cnf=/etc/my.cnf
+    labels:
+      prometheus-job: mariadb

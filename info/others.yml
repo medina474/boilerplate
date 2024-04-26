@@ -9,13 +9,3 @@
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${USER}
       MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD}
-
-  redis:
-    image: redis:7.2-alpine
-    container_name: redis
-    volumes:
-      - redis:/data
-    networks:
-      - proxy-public
-    ports:
-      - 6379:6379

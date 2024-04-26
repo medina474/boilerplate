@@ -2,6 +2,9 @@ networks:
   boilerplate_network:
     external: true
 
+volumes:
+  data:
+
 services:
   portainer:
     image: portainer/portainer-ce:${PORTAINER_VERSION:-2.20.1-alpine}
@@ -9,8 +12,10 @@ services:
     command: -H unix:///var/run/docker.sock --admin-password '$$2y$$10$$DtuHkrmVGrE734LWmN9aEu81YWeYXHfASL0d6XKuXmBWpskS4jNOO'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data:/data
+      - data:/data
     restart: always
+    ports:
+      - ${PORTAINER_PORT:-9000}:9000
     networks:
       - boilerplate_network
     labels:

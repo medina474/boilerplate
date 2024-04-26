@@ -9,7 +9,6 @@ RUN echo "fr_FR.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-
 # Change port and update user, owner and group
 RUN sed -i \
     -e 's/^user = www-data*/user = nextcloud/' \
@@ -63,6 +62,17 @@ RUN set -eux; \
   ; \
   docker-php-ext-configure intl; \
   docker-php-ext-install -j$(nproc) intl;
+
+RUN pecl install redis-6.0.2 \
+	&& pecl install \
+	&& docker-php-ext-enable redis
+
+RUN apt-get update && apt-get install -y libmemcached-dev libssl-dev zlib1g-dev \
+	&& pecl install memcached-3.2.0 \
+	&& docker-php-ext-enable memcached
+
+RUN pecl install apcu  \
+	&& docker-php-ext-enable apcu
 
 # Clean up
 RUN set -eux; \

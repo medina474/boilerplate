@@ -43,7 +43,6 @@ volumes:
   loki:
   mongodb:
   mongodb_config:
-  redis:
   prometheus:
   alertmanager:
   jaeger:
