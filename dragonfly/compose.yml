@@ -15,6 +15,8 @@ services:
       - boilerplate_network
     volumes:
       - ./data:/data
+    labels:
+      prometheus-job: dragonfly
 
   webdis:
     container_name: webdis

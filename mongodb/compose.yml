@@ -27,3 +27,5 @@ services:
       - 9216:9216
     environment:
       MONGODB_URI: mongodb://mongodb:${MONGODB_PORT:-27017}
+    labels:
+      prometheus-job: mongodb

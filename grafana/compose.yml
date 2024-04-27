@@ -51,7 +51,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.external-url=/prometheus/'
-      - '-alertmanager.url=http://alertmanager:9093'
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
@@ -62,8 +61,8 @@ services:
       - boilerplate_network
     ports:
       - ${PROMETHEUS_PORT}:9090
-#    extra_hosts:
-#      - host.docker.internal=host-gateway
+    extra_hosts:
+      - host.docker.internal=host-gateway
     labels:
       traefik.enable: true
       traefik.http.routers.prometheus.entrypoints: websecure
@@ -75,7 +74,7 @@ services:
     container_name: alertmanager
     image: prom/alertmanager:${ALERTMANAGER_VERSION}
     command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--log.level=debug'
     ports:
       - ${ALERTMANAGER_PORT:-9093}:9093

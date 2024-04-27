@@ -156,6 +156,8 @@ services:
       - 3100:3100
     volumes:
       - loki:/loki
+    labels:
+      prometheus-job: loki
 
 ## PROMETHEUS
 

@@ -47,6 +47,8 @@ services:
       - 9187:9187
     environment:
       DATA_SOURCE_NAME: postgresql://postgres:supermotdepasse@postgresql:5432/postgres?sslmode=disable
+    labels:
+      prometheus-job: postgresql
 
   pgadmin:
     container_name: pgadmin
