@@ -25,11 +25,11 @@ scrape_configs:
         - 'host.docker.internal:9323'
 
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: prometheus
-    metrics_path: /prometheus/metrics
-    static_configs:
-      - targets:
-          - '127.0.0.1:9090'
+  # - job_name: prometheus
+  #   metrics_path: /prometheus/metrics
+  #   static_configs:
+  #     - targets:
+  #         - '127.0.0.1:9090'
 
   # - job_name: traefik
   #   metrics_path: /metrics
@@ -47,22 +47,6 @@ scrape_configs:
         regex: .+
         action: keep
 
-  # - job_name: 'mongodb'
-  #   metrics_path: /metrics
-  #   static_configs:
-  #     - targets: ['mongodb-exporter:9216']
-
-  # - job_name: postgresql
-  #   metrics_path: /metrics
-  #   static_configs:
-  #     - targets:
-  #         - 'postgres-metrics-exporter:9187'
-
-  # - job_name: mariadb
-  #   metrics_path: /metrics
-  #   static_configs:
-  #     - targets:
-  #         - 'mysqld-exporter:9104'
 
   # - job_name: minio
   #   metrics_path: /minio/v2/metrics/bucket
@@ -78,33 +62,12 @@ scrape_configs:
   #   - targets:
   #     - 'minio:9000'
 
-  # - job_name: loki
-  #   metrics_path: /metrics
-  #   scheme: http
-  #   static_configs:
-  #     - targets:
-  #         - 'loki:3100'
-
-  # - job_name: dragonfly
-  #   metrics_path: /metrics
-  #   scheme: http
-  #   static_configs:
-  #     - targets:
-  #         - 'dragonfly:6379'
-
   # - job_name: rabbitmq
   #   metrics_path: /metrics
   #   scheme: http
   #   static_configs:
   #     - targets:
   #         - 'rabbitmq:15692'
-
-  # - job_name: php
-  #   metrics_path: /metrics
-  #   scheme: http
-  #   static_configs:
-  #     - targets:
-  #         - 'php-exporter:9253'
 
   #- job_name: "node"
 
