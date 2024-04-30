@@ -2,6 +2,8 @@
 
 Démarrer sur l'iso
 
+### Debian GNU/Linux UEFI Installer menu
+
 Advanced options ...
 
 ... Expert install
@@ -12,7 +14,7 @@ Advanced options ...
 
 - Select a language : French - Français
 - Pays (territoire ou région) : France
-- Pays qui servira de base aux paramètres régionaux par défaut : France
+- Pays qui servira de base aux paramètres régionaux par défaut : France fr_FR.UTF-8
 - Paramètres régionaux supplémentaires : (aucun)
 
 ### Acces software for a blind person using a braille display
@@ -153,7 +155,8 @@ Editer .bashrc
 
 ```
 alias ls='ls --color=auto -la'
-PS1='\e[1;33m\u@\h \W\$ \e[m'
+PS1="\[\e[01;33m\]\u@\h \[\e[01;32m\][\w]\[\e[0m\]\n\$ "
+
 TMOUT=3000
 ```
 

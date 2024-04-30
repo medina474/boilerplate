@@ -92,7 +92,7 @@ Chrome – Paramètres – Rechercher : certificats – Gérer les certificats
 ### 1. Générer une demande de certificat et la clé privée associée
 
 ```shell-session
-openssl req -new -utf8 -newkey rsa:1024 -nodes -config boilerplate.cnf
+openssl req -new -utf8 -newkey rsa:2048 -nodes -config boilerplate.cnf
  -days 180 -keyout boilerplate.key –out boilerplate.csr
 ```
 
