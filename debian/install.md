@@ -155,7 +155,7 @@ Editer .bashrc
 
 ```
 alias ls='ls --color=auto -la'
-PS1="\[\e[01;33m\]\u@\h \[\e[01;32m\][\w]\[\e[0m\]\n\$ "
+PS1="\[\e[01;33m\]\u@\h \[\e[01;34m\][\w]\[\e[0m\]\n\$ "
 
 TMOUT=3000
 ```

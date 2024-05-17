@@ -1,0 +1,14 @@
+services:
+  strapi:
+    container_name: strapi
+    image: strapi/strapi
+    environment:
+      DATABASE_NAME: strapi
+      DATABASE_HOST: 0.0.0.0
+      DATABASE_PORT: 1234
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+    ports:
+      - 1337:1337
+    volumes:
+      - ./data:/srv/app \

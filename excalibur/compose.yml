@@ -1,0 +1,17 @@
+networks:
+  boilerplate_network:
+    external: true
+
+services:
+
+  excalibur-apache:
+    container_name: apache
+    image: excalibur/apache
+    build:
+      context: .
+    volumes:
+      - ./www:/var/www/html
+    ports:
+      - 8000:80
+    networks:
+      - boilerplate_network
