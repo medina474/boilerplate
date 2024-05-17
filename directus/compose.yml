@@ -6,7 +6,7 @@ services:
 
   directus:
     container_name: directus
-    image: directus/directus:${DIRECTUS_VERSION:-10.10}
+    image: directus/directus:${DIRECTUS_VERSION:-10.11}
     networks:
       - boilerplate_network
     volumes:
