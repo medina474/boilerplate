@@ -1,8 +1,4 @@
 
-
-
-
-
 ### Configurations supplémentaires
 
 Configurer les tabulations dans l'éditeur Nano.
@@ -40,17 +36,6 @@ systemctl restart rsyslog
 apt install --no-install-recommends msmtp-mta
 
 ## Mariadb
-
-apt update
-apt install --no-install-recommends mariadb-server
-mysql_secure_installation
-
-- Switch to unix_socket authentication [Y/n] y
-- Change the root password? [Y/n] n
-- Remove anonymous users? [Y/n] y
-- Disallow root login remotely? [Y/n] y
-- Remove test database and access to it? [Y/n] y
-- Reload privilege tables now? [Y/n] y
 
 Créer un utilisateur avec privilèges. le compte root à accès que depuis le terminal.
 

@@ -22,3 +22,12 @@ services:
       traefik.http.routers.smtp4dev.tls: true
       traefik.http.routers.smtp4dev.rule: ${SMTP4DEV_TRAEFIK_RULE}
       traefik.http.services.smtp4dev.loadbalancer.server.port: 8080
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - 1025
+      - 8025
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
