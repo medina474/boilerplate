@@ -1,5 +1,5 @@
 #docker build ./ -t boilerplate/postgresql:2024.04
-FROM debian:testing-slim as build-essential
+FROM debian:testing-slim AS build-essential
 
 RUN set -eux; \
   apt-get update; \
@@ -13,7 +13,7 @@ RUN set -eux; \
   checkinstall \
   ;
 
-FROM build-essential as build-pgdev
+FROM build-essential AS build-pgdev
 
 RUN set -eux; \
   apt-get update; \
@@ -24,7 +24,7 @@ RUN set -eux; \
 # =============================================================================
 # PostgreSQL
 # Non utilisé
-FROM build-essential as postgresql
+FROM build-essential AS postgresql
 
 ARG postgresql_release=16.2
 ARG postgresql_release_checksum=sha256:2b8201047ec81acd1bad29dba278d788e7891b9c3e8232eda16bb29dec8131c7
@@ -68,7 +68,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --pkgnam
 # OGC Simple Features Access 1.2.
 # PostGIS utilise l'API C pour exposer certaines fonctions de SFCGAL dans
 # des bases de données spatiales
-FROM build-pgdev as sfcgal
+FROM build-pgdev AS sfcgal
 
 # Télécharger
 ARG sfcgal_release=1.5.1
@@ -102,7 +102,7 @@ RUN checkinstall -D --install=yes --fstrans=no --backup=no --pakdir=/tmp \
 
 # =============================================================================
 # PostGIS
-FROM sfcgal as postgis
+FROM sfcgal AS postgis
 
 ARG postgis_release=3.5.0
 ARG postgis_release_checksum=sha256:3982af39fc9f56bed04a0724f99d5130a0e9cb8af7892296f55d02451190cdd9
@@ -142,7 +142,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 # pgRouting étend la base de données géospatiale PostGIS / PostgreSQL pour
 # fournir une fonctionnalité de routage géospatial.
 #
-FROM build-pgdev as pgrouting
+FROM build-pgdev AS pgrouting
 
 ARG pgrouting_release=3.6.2
 ARG pgrouting_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
@@ -179,7 +179,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 # enregistrement historique des modifications de données dans une table.
 #
 
-FROM build-pgdev as periods
+FROM build-pgdev AS periods
 
 ARG periods_release=1.2.2
 ARG periods_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
@@ -204,7 +204,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 # =============================================================================
 # TimescaleDB
 
-FROM build-pgdev as timescaledb
+FROM build-pgdev AS timescaledb
 
 ARG timescaledb_release=2.13.0
 ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
@@ -241,7 +241,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 # Apache Age
 # https://github.com/apache/age
 
-FROM build-pgdev as age
+FROM build-pgdev AS age
 
 ARG age_release=1.5.0-rc0
 ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
@@ -273,7 +273,7 @@ RUN make -j$(nproc) install
 # utilisant la bibliothèque libsodium pour les algorithmes cryptographiques
 # de haut niveau.
 
-FROM build-essential as libsodium
+FROM build-essential AS libsodium
 
 ARG libsodium_release=1.0.18
 ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
@@ -296,7 +296,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
   --pkgname=libsodium23 \
   --nodoc
 
-FROM libsodium as pgsodium
+FROM libsodium AS pgsodium
 
 ARG pgsodium_release=3.1.6
 ARG pgsodium_release_checksum=sha256:f46af33b13ce895b3d8eb2c01c2d5b0b6528eab1e51cd624ddc54daea26e230e
@@ -325,7 +325,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 
 # =============================================================================
 # pgVector
-FROM build-pgdev as pgvector
+FROM build-pgdev AS pgvector
 
 ARG pgvector_release=0.6.2
 ARG pgvector_release_checksum=sha256:a11cc249a9f3f3d7b13069a1696f2915ac28991a72d7ba4e2bcfdceddbaeae49
@@ -347,7 +347,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 
 # =============================================================================
 # postgresql-anonymizer
-FROM build-pgdev as pganon
+FROM build-pgdev AS pganon
 
 ARG anon_release=1.3.2
 ARG anon_release_checksum=sha256:4a7238e71cf6ea4cf492cdc4bd3fd9b76bbdc4053d5dd696ba3fe1fa2ab3c318
@@ -373,7 +373,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 # =============================================================================
 # pgCron
 #
-FROM build-pgdev as pgcron
+FROM build-pgdev AS pgcron
 
 # Télécharger
 ARG pg_cron_release=1.6.2
@@ -397,7 +397,7 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp --nodoc
 # =============================================================================
 # Image finale de production
 #
-FROM debian:testing-slim as production
+FROM debian:testing-slim AS production
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -460,7 +460,7 @@ RUN set -eux; \
 	echo 'fr_FR.UTF-8 UTF-8' >> /etc/locale.gen; \
 	locale-gen; \
 	locale -a | grep 'fr_FR.utf8'
-ENV LANG fr_FR.utf8
+ENV LANG=fr_FR.utf8
 
 RUN set -eux; \
 	apt-get update; \
@@ -485,10 +485,10 @@ RUN set -ex; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME"
 
-ENV PG_MAJOR 16
-ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
+ENV PG_MAJOR=16
+ENV PATH=$PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 
-ENV PG_VERSION 16.2-1.pgdg120+2
+ENV PG_VERSION=16.2-1.pgdg120+2
 
 RUN set -ex; \
 	\
@@ -581,7 +581,7 @@ RUN set -eux; \
 
 RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 3777 /var/run/postgresql
 
-ENV PGDATA /var/lib/postgresql/data
+ENV PGDATA=/var/lib/postgresql/data
 # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
 RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 VOLUME /var/lib/postgresql/data
