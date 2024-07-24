@@ -82,7 +82,7 @@ ADD --checksum=${sfcgal_release_checksum} \
 RUN tar -xvf /tmp/sfcgal.tar.gz -C /tmp --one-top-level --strip-components 1 && \
     rm -rf /tmp/sfcgal.tar.gz
 
- # Install build dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcgal-dev \
     libboost-serialization1.83-dev \

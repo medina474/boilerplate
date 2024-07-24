@@ -1,6 +1,7 @@
 FROM debian
 
-RUN apt-get update && apt-get install -y \
+RUN set -eux; \
+    apt-get update && apt-get install -y \
     apache2 \
   && rm -rf /var/lib/apt/lists/*
 
