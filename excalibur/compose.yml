@@ -12,6 +12,6 @@ services:
     volumes:
       - ./www:/var/www/html
     ports:
-      - 8000:80
+      - 8001:80
     networks:
       - boilerplate_network
