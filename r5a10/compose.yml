@@ -32,10 +32,20 @@ services:
 
   nocodb:
     container_name: r5a10-nocodb
-    image: nocodb/nocodb:latest
+    image: nocodb/nocodb:${NOCODB_VERSION:-0.251.3}
     ports:
       - 8080:8080
+    depends_on:
+      mariadb:
+        condition: service_healthy
     environment:
-      NC_DB: mysql://mariadb
+      NC_DB: mysql2://mariadb?u=root&p=supermotdepasse&d=nocodb
       NC_ADMIN_EMAIL: ${ADMIN_EMAIL}
       NC_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+  directus:
+    container_name: r5a10-directus
+    image: directus/directus:${DIRECTUS_VERSION:-11.0.0-rc.3}
+    volumes:
+      - ./data/directus/uploads:/directus/uploads
+      - ./data/directus/extensions:/directus/extensions
