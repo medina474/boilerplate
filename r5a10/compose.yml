@@ -1,17 +1,22 @@
+configs:
+  mariadb_initdb:
+    file: ./mariadb/docker-entrypoint-initdb.d
+
 services:
 
 # MariaDB Server
 # https://mariadb.org/
 
   mariadb:
-    image: mariadb:${MARIADB_VERSION:-11.3}
-    container_name: mariadb
+    container_name: r5a10-mariadb
+    build:
+      context: ./mariadb
     restart: no
     configs:
       - source: mariadb_initdb
         target: /docker-entrypoint-initdb.d
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/mariadb:/var/lib/mysql
     ports:
       - 3306:3306
     environment:
