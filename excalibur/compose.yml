@@ -1,17 +1,33 @@
-networks:
-  boilerplate_network:
-    external: true
+
+configs:
+  mariadb_initdb:
+    file: ./docker-entrypoint-initdb.d
 
 services:
 
-  excalibur-apache:
-    container_name: apache
+  apache:
+    container_name: excalibur-apache
     image: excalibur/apache
+    restart: no
     build:
       context: .
     volumes:
       - ./www:/var/www/html
     ports:
       - 8001:80
-    networks:
-      - boilerplate_network
+
+  mariadb:
+    image: mariadb:${MARIADB_VERSION:-11.3}
+    container_name: excalibur-mariadb
+    restart: no
+    configs:
+      - source: mariadb_initdb
+        target: /docker-entrypoint-initdb.d
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}

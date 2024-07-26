@@ -49,3 +49,14 @@ services:
     volumes:
       - ./data/directus/uploads:/directus/uploads
       - ./data/directus/extensions:/directus/extensions
+
+  inbucket:
+    container_name: r5a10-inbucket
+    image: inbucket/inbucket
+    volumes:
+      - ./data/inbucket/storage:/storage/
+      - ./data/inbucket/config:/config/
+    ports:
+      - 9000:9000/tcp
+      - 2500:2500/tcp
+      - 1100:1100/tcp
