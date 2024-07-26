@@ -1,10 +1,11 @@
+#docker build ./ -t iutsd/r5a10:2024.07
 FROM redhat/ubi9-minimal
 
-# user 999/ group 999, that we want to use for compatibility with the ubuntu image.
+# Utilisateur mysql
 RUN groupadd --gid 999 -r mysql && \
 	useradd -r -g mysql mysql --home-dir /var/lib/mysql --uid 999
 
-ENV GOSU_VERSION 1.17
+ENV GOSU_VERSION=1.17
 RUN set -eux; \
 	rpmArch="$(rpm --query --queryformat='%{ARCH}' rpm)"; \
 	case "$rpmArch" in \
@@ -102,7 +103,7 @@ VOLUME /var/lib/mysql
 
 RUN mkdir /docker-entrypoint-initdb.d
 
-COPY healthcheck.sh /usr/local/bin/healthcheck.sh
+COPY healthcheck.sh /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
