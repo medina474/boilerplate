@@ -18,7 +18,7 @@ services:
     volumes:
       - ./data/mariadb:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 3306:${MARIADB_PORT:-3306}
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 10s
@@ -29,6 +29,9 @@ services:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+
+# Redis
+# https://redis.io/fr/
 
   redis:
     container_name: r5a10-redis
@@ -42,6 +45,10 @@ services:
     volumes:
       - ./data/redis:/data
 
+# NocoDB
+# Build Databases As Spreadsheets : No-Coding Required
+# https://nocodb.com/
+
   nocodb:
     container_name: r5a10-nocodb
     image: nocodb/nocodb:${NOCODB_VERSION:-0.251.3}
@@ -53,10 +60,14 @@ services:
       redis:
         condition: service_started
     environment:
-      NC_DB: mysql2://mariadb?u=root&p=supermotdepasse&d=${NOCODB_DATABASE}
+      NC_DB: ${NOCODB_DB_CLIENT}://${NOCODB_DB_HOST}?u=${NOCODB_DB_USER:-nocodb}&p=${NOCODB_DB_PASSWORD}&d=${NOCODB_DB_DATABASE:-nocodb}
       NC_ADMIN_EMAIL: ${ADMIN_EMAIL}
       NC_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      NC_REDIS_URL: redis://:${REDIS_PASSWORD}@redis
+      NC_REDIS_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST:-redis}
+
+# Directus
+# The backend to build anything or everything.
+# https://directus.io/
 
   directus:
     container_name: r5a10-directus
@@ -87,7 +98,7 @@ services:
       CACHE_ENABLED: true
       CACHE_AUTO_PURGE: true
       CACHE_STORE: redis
-      REDIS_HOST: redis
+      REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
 
       ADMIN_EMAIL: ${ADMIN_EMAIL}
@@ -98,6 +109,10 @@ services:
       EMAIL_SMTP_HOST: ${DIRECTUS_SMTP_HOST:-inbucket}
       EMAIL_SMTP_PORT: ${DIRECTUS_SMTP_PORT:-2500}
 
+# Inbucket
+# Inbucket is an email testing application; 
+# it will accept messages for any email address and make them available to view via a web interface. 
+# https://inbucket.org/
   inbucket:
     container_name: r5a10-inbucket
     image: inbucket/inbucket:3.0.3
