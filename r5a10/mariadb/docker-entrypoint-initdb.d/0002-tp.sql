@@ -1,4 +1,5 @@
 create database if not exists tp1;
+use tp1;
 
 -- 
 create table if not exists `villes` (
@@ -25,6 +26,7 @@ create table if not exists `quartiers` (
   spatial index(coordonnees)
 ) engine=myisam;
 
+---
 truncate table `villes`;
 
 insert into `villes` (nom, coordonnees) values 
@@ -46,6 +48,8 @@ insert into `routes` (nom, coordonnees) values
 ('route BC', ST_GeomFromText('LINESTRING(5 20, 25 5)'));
 
 truncate table `quartiers`;
+
+--
 
 -- Quelles sont les villes les plus proches
 select v1.nom, v2.nom, 
