@@ -1,0 +1,41 @@
+@couchDB = http://{{$dotenv DB_ROOT_USER}}:{{$dotenv DB_ROOT_PASSWORD}}@localhost:5984
+
+GET {{couchDB}}/_all_dbs
+
+### Creates a new database. 
+PUT {{couchDB}}/db
+
+### Creates a new document in the specified database, using the supplied JSON document structure.
+POST {{couchDB}}/db
+Accept: application/json
+Content-Type: application/json
+
+{
+  "servings": 4,
+  "subtitle": "Delicious with fresh bread",
+  "title": "Fish Stew"
+}
+
+### 
+GET {{couchDB}}/db/_all_docs
+
+### 
+GET {{couchDB}}/db/74913d6d85b8af1d174baf3fe5000507
+
+###
+POST {{couchDB}}/db/_find 
+Accept: application/json
+Content-Type: application/json
+Content-Length: 168
+Host: localhost:5984
+
+{
+    "selector": {
+        "year": {"$gt": 2010}
+    },
+    "fields": ["_id", "_rev", "year", "title"],
+    "sort": [{"year": "asc"}],
+    "limit": 2,
+    "skip": 0,
+    "execution_stats": true
+}

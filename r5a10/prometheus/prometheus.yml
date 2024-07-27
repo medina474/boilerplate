@@ -8,3 +8,15 @@ scrape_configs:
     static_configs:
       - targets:
         - 'host.docker.internal:9323'
+
+  - job_name: prometheus
+    static_configs:
+      - targets:
+         - '127.0.0.1:9090'
+
+  - job_name: minio
+    metrics_path: /minio/v2/metrics/bucket
+    scheme: http
+    static_configs:
+      - targets:
+        - 'minio:9000'
