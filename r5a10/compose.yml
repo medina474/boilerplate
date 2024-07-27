@@ -9,8 +9,12 @@ configs:
     file: ./grafana/dashboards
 
 volumes:
+  mariadb: {}
+  redis: {}
   prometheus: {}
   grafana: {}
+  inbucket_config: {}
+  inbucket_storage: {}
 
 services:
 
@@ -27,7 +31,7 @@ services:
       - source: mariadb_initdb
         target: /docker-entrypoint-initdb.d
     volumes:
-      - ./data/mariadb:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     ports:
       - 3306:${MARIADB_PORT:-3306}
     healthcheck:
@@ -55,7 +59,7 @@ services:
       - '--loglevel warning'
       - '--requirepass ${REDIS_PASSWORD}'
     volumes:
-      - ./data/redis:/data
+      - redis:/data
 
 # NocoDB
 # Instantly turn your Database into a No-Code Platform.
@@ -132,6 +136,9 @@ services:
       - '2500:2500' # SMTP
       - '1100:1100' # POP3
       - '8082:9000' # web interface
+    volumes:
+      - inbucket_config:/config
+      - inbucket_storage:/storage
 
 # Prometheus
 # Monitoring system & time series database
