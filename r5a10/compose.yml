@@ -3,11 +3,14 @@ configs:
     file: ./mariadb/docker-entrypoint-initdb.d
   prometheus_config:
     file: ./prometheus/prometheus.yml
-  grafana_config:
-    file: ./grafana
+  grafana_provisioning:
+    file: ./grafana/provisioning
+  grafana_dashboards:
+    file: ./grafana/dashboards
 
 volumes:
   prometheus: {}
+  grafana: {}
 
 services:
 
@@ -164,12 +167,17 @@ services:
         limits:
           memory: 100M
     configs:
-      - source: grafana_config
-        target: /etc/grafana
+      - source: grafana_provisioning
+        target: /etc/grafana/provisioning
+      - source: grafana_dashboards
+        target: /etc/grafana/dashboards
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
     environment:
-      GF_SECURITY_ADMIN_USER: ${ADMIN_USER}
+      GF_SECURITY_ADMIN_EMAIL: ${ADMIN_EMAIL}
       GF_SECURITY_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      GF_USERS_DEFAULT_THEME: light
       GF_USERS_ALLOW_SIGN_UP: false
       GF_FEATURE_TOGGLES_ENABLE: traceQLStreaming metricsSummary lokiFormatQuery alertmanagerRemoteOnly
