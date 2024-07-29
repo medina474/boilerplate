@@ -1,10 +1,30 @@
 configs:
   mariadb_initdb:
     file: ./mariadb/docker-entrypoint-initdb.d
+  prometheus_config:
+    file: ./prometheus/prometheus.yml
+  grafana_provisioning:
+    file: ./grafana/provisioning
+  grafana_dashboards:
+    file: ./grafana/dashboards
+
+volumes:
+  mariadb: {}
+  redis: {}
+  prometheus: {}
+  grafana: {}
+  inbucket_config: {}
+  inbucket_storage: {}
+  mongodb: {}
+  mongodb_configdb: {}
+  couchdb: {}
+  neo4j: {}
+  minio: {}
 
 services:
 
 # MariaDB Server
+# One of the most popular open source relational databases
 # https://mariadb.org/
 
   mariadb:
@@ -16,19 +36,45 @@ services:
       - source: mariadb_initdb
         target: /docker-entrypoint-initdb.d
     volumes:
-      - ./data/mariadb:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 3306:${MARIADB_PORT:-3306}
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
-      interval: 10s
+      interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 20s
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+
+# Redis
+# In-memory key-value database
+# https://redis.io/fr/
+
+  redis:
+    container_name: r5a10-redis
+    image: redis:${REDIS_VERSION:-7.2.5}
+    restart: no
+    command:
+      - 'redis-server'
+      - '--save 60 1'
+      - '--loglevel warning'
+      - '--requirepass ${DB_ROOT_PASSWORD}'
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${DB_ROOT_PASSWORD}", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    volumes:
+      - redis:/data
+
+# NocoDB
+# Instantly turn your Database into a No-Code Platform.
+# https://nocodb.com/
 
   nocodb:
     container_name: r5a10-nocodb
@@ -38,10 +84,17 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      NC_DB: mysql2://mariadb?u=root&p=supermotdepasse&d=nocodb
+      NC_DB: ${NOCODB_DB_CLIENT}://${NOCODB_DB_HOST}?u=${NOCODB_DB_USER:-nocodb}&p=${NOCODB_DB_PASSWORD}&d=${NOCODB_DB_DATABASE:-nocodb}
       NC_ADMIN_EMAIL: ${ADMIN_EMAIL}
       NC_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      NC_REDIS_URL: redis://:${DB_ROOT_PASSWORD}@${REDIS_HOST:-redis}
+
+# Directus
+# The backend to build anything or everything.
+# https://directus.io/
 
   directus:
     container_name: r5a10-directus
@@ -49,14 +102,161 @@ services:
     volumes:
       - ./data/directus/uploads:/directus/uploads
       - ./data/directus/extensions:/directus/extensions
+    ports:
+      - 8081:${DIRECTUS_PORT:-8081}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      PUBLIC_URL: http://127.0.0.1:8081/
+      PORT: ${DIRECTUS_PORT:-8081}
 
+      DB_CLIENT: ${DIRECTUS_DB_CLIENT}
+      DB_HOST: ${DIRECTUS_DB_HOST}
+      DB_PORT: ${DIRECTUS_DB_PORT}
+      DB_DATABASE: ${DIRECTUS_DB_DATABASE:-directus}
+      DB_USER: ${DIRECTUS_DB_USER:-directus}
+      DB_PASSWORD: ${DIRECTUS_DB_PASSWORD}
+
+      CACHE_ENABLED: true
+      CACHE_AUTO_PURGE: true
+      CACHE_STORE: redis
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PASSWORD: ${DB_ROOT_PASSWORD}
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      EMAIL_FROM: directus@univ-lorraine.fr
+      EMAIL_TRANSPORT: smtp
+      EMAIL_SMTP_HOST: ${DIRECTUS_SMTP_HOST:-inbucket}
+      EMAIL_SMTP_PORT: ${DIRECTUS_SMTP_PORT:-2500}
+
+# Inbucket
+# Email testing application;
+# it will accept messages for any email address and make them available to view via a web interface.
+# https://inbucket.org/
   inbucket:
     container_name: r5a10-inbucket
-    image: inbucket/inbucket
-    volumes:
-      - ./data/inbucket/storage:/storage/
-      - ./data/inbucket/config:/config/
+    image: inbucket/inbucket:${INBUCKET_VERSION:-3.0.3}
     ports:
-      - 9000:9000/tcp
-      - 2500:2500/tcp
-      - 1100:1100/tcp
+      - '2500:2500' # SMTP
+      - '1100:1100' # POP3
+      - '8082:9000' # web interface
+    volumes:
+      - inbucket_config:/config
+      - inbucket_storage:/storage
+
+# Prometheus
+# Monitoring system & time series database
+# https://prometheus.io/
+  prometheus:
+    container_name: r5a10-prometheus
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.53.0}
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus:/prometheus
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 9090:9090
+    extra_hosts:
+      - host.docker.internal=host-gateway
+#/etc/docker/daemon.json
+#{
+#  "metrics-addr": "0.0.0.0:9323"
+#}
+
+# Grafana
+# Open source analytics & monitoring solution for every database.
+# https://grafana.com/
+  grafana:
+    container_name: r5a10-grafana
+    image: grafana/grafana-oss:${GRAFANA_VERSION:-11.1.3}
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    configs:
+      - source: grafana_provisioning
+        target: /etc/grafana/provisioning
+      - source: grafana_dashboards
+        target: /etc/grafana/dashboards
+    volumes:
+      - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    environment:
+      GF_SECURITY_ADMIN_EMAIL: ${ADMIN_EMAIL}
+      GF_SECURITY_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      GF_USERS_DEFAULT_THEME: light
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_FEATURE_TOGGLES_ENABLE: traceQLStreaming metricsSummary lokiFormatQuery alertmanagerRemoteOnly
+
+# MongoDB
+#
+# https://www.mongodb.com/
+  mongodb:
+    container_name: r5a10-mongodb
+    image: mongo:${MONGODB_VERSION:-7.0.7-jammy}
+    volumes:
+      - mongodb_configdb:/data/configdb
+      - mongodb:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+
+# CouchDB
+#
+# https://couchdb.apache.org/
+  couchdb:
+    container_name: r5a10-couchdb
+    image: couchdb:${COUCH_DB_VERSION:-3.3}
+    volumes:
+      - couchdb:/opt/couchdb/data
+    ports:
+      - 5984:5984
+    environment:
+      COUCHDB_USER: ${DB_ROOT_USER}
+      COUCHDB_PASSWORD: ${DB_ROOT_PASSWORD}
+
+# Neo4J
+# Des graphes ultra-rapides, à l’échelle du pétaoctet
+# https://neo4j.com/
+  neo4j:
+    container_name: r5a10-neo4j
+    image: neo4j:${NEO4J_VERSION:-5.18.1-community}
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - neo4j:/data
+    environment:
+      NEO4J_AUTH: neo4j/${DB_ROOT_PASSWORD}
+
+# MinIO
+  minio:
+    container_name: r5a10-minio
+    image: minio/minio
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: ${DB_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MINIO_BROWSER_LOGIN_ANIMATION: off
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+      MINIO_PROMETHEUS_URL: http://prometheus:9090
+      MINIO_PROMETHEUS_JOB_ID: minio
+    volumes:
+      - minio:/data
+    ports:
+      - 9000:9000
+      - 9001:9001

@@ -27,10 +27,8 @@ RUN set -eux; \
 FROM build-essential AS postgresql
 
 ARG postgresql_release=16.2
-ARG postgresql_release_checksum=sha256:2b8201047ec81acd1bad29dba278d788e7891b9c3e8232eda16bb29dec8131c7
 
-ADD --checksum=${postgresql_release_checksum} \
-  "https://ftp.postgresql.org/pub/source/v16.2/postgresql-${postgresql_release}.tar.gz" \
+ADD "https://ftp.postgresql.org/pub/source/v16.2/postgresql-${postgresql_release}.tar.gz" \
   /tmp/postgresql.tar.gz
 
 RUN set -eux; \
@@ -72,10 +70,8 @@ FROM build-pgdev AS sfcgal
 
 # Télécharger
 ARG sfcgal_release=1.5.1
-ARG sfcgal_release_checksum
 
-ADD --checksum=${sfcgal_release_checksum} \
-    "https://gitlab.com/sfcgal/SFCGAL/-/archive/v${sfcgal_release}/SFCGAL-v${sfcgal_release}.tar.gz" \
+ADD "https://gitlab.com/sfcgal/SFCGAL/-/archive/v${sfcgal_release}/SFCGAL-v${sfcgal_release}.tar.gz" \
     /tmp/sfcgal.tar.gz
 
 # Extraire
@@ -105,10 +101,8 @@ RUN checkinstall -D --install=yes --fstrans=no --backup=no --pakdir=/tmp \
 FROM sfcgal AS postgis
 
 ARG postgis_release=3.5.0
-ARG postgis_release_checksum=sha256:3982af39fc9f56bed04a0724f99d5130a0e9cb8af7892296f55d02451190cdd9
 
-ADD --checksum=${postgis_release_checksum} \
-  "https://postgis.net/stuff/postgis-${postgis_release}dev.tar.gz" \
+ADD "https://postgis.net/stuff/postgis-${postgis_release}dev.tar.gz" \
   /tmp/postgis.tar.gz
 
 RUN set -eux; \
@@ -145,10 +139,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS pgrouting
 
 ARG pgrouting_release=3.6.2
-ARG pgrouting_release_checksum=sha256:f4a1ed79d6f714e52548eca3bb8e5593c6745f1bde92eb5fb858efd8984dffa2
 
-ADD --checksum=${pgrouting_release_checksum} \
-  "https://github.com/pgRouting/pgrouting/releases/download/v${pgrouting_release}/pgrouting-${pgrouting_release}.tar.gz" \
+ADD "https://github.com/pgRouting/pgrouting/releases/download/v${pgrouting_release}/pgrouting-${pgrouting_release}.tar.gz" \
   /tmp/pgrouting.tar.gz
 
 RUN set -eux; \
@@ -182,10 +174,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS periods
 
 ARG periods_release=1.2.2
-ARG periods_release_checksum=sha256:36ec2e362df3389bae1591ef837f527554bb8c58be26e2b2481971a492417521
 
-ADD --checksum=${periods_release_checksum} \
-  "https://github.com/xocolatl/periods/archive/refs/tags/v${periods_release}.tar.gz" \
+ADD "https://github.com/xocolatl/periods/archive/refs/tags/v${periods_release}.tar.gz" \
   /tmp/periods.tar.gz
 
 RUN set -eux; \
@@ -207,11 +197,9 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS timescaledb
 
 ARG timescaledb_release=2.13.0
-ARG timescaledb_release_checksum=sha256:584a351c7775f0e067eaa0e7277ea88cab9077cc4c455cbbf09a5d9723dce95d
 
 # Download and extract
-ADD --checksum=${timescaledb_release_checksum} \
-  "https://github.com/timescale/timescaledb/archive/refs/tags/${timescaledb_release}.tar.gz" \
+ADD "https://github.com/timescale/timescaledb/archive/refs/tags/${timescaledb_release}.tar.gz" \
   /tmp/timescaledb.tar.gz
 
 RUN set -eux; \
@@ -244,10 +232,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS age
 
 ARG age_release=1.5.0-rc0
-ARG age_release_checksum=sha256:7bb4a89661cbcf9a91a332e4e963fd245182be20e540a61a9a2ca0f835a083d8
 
-ADD --checksum=${age_release_checksum} \
-  "https://github.com/apache/age/archive/refs/tags/PG16/v${age_release}.tar.gz" \
+ADD "https://github.com/apache/age/archive/refs/tags/PG16/v${age_release}.tar.gz" \
   /tmp/age.tar.gz
 
 RUN set -eux; \
@@ -276,10 +262,8 @@ RUN make -j$(nproc) install
 FROM build-essential AS libsodium
 
 ARG libsodium_release=1.0.18
-ARG libsodium_release_checksum=sha256:6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1
 
-ADD --checksum=${libsodium_release_checksum} \
-  "https://download.libsodium.org/libsodium/releases/libsodium-${libsodium_release}.tar.gz" \
+ADD "https://download.libsodium.org/libsodium/releases/libsodium-${libsodium_release}.tar.gz" \
   /tmp/libsodium.tar.gz
 
 RUN tar -xvf /tmp/libsodium.tar.gz -C /tmp && \
@@ -299,10 +283,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM libsodium AS pgsodium
 
 ARG pgsodium_release=3.1.6
-ARG pgsodium_release_checksum=sha256:f46af33b13ce895b3d8eb2c01c2d5b0b6528eab1e51cd624ddc54daea26e230e
 
-ADD --checksum=${pgsodium_release_checksum} \
-  "https://github.com/michelp/pgsodium/archive/refs/tags/v${pgsodium_release}.tar.gz" \
+ADD "https://github.com/michelp/pgsodium/archive/refs/tags/v${pgsodium_release}.tar.gz" \
   /tmp/pgsodium.tar.gz
 
 RUN tar -xvf /tmp/pgsodium.tar.gz -C /tmp && \
@@ -328,10 +310,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS pgvector
 
 ARG pgvector_release=0.6.2
-ARG pgvector_release_checksum=sha256:a11cc249a9f3f3d7b13069a1696f2915ac28991a72d7ba4e2bcfdceddbaeae49
 
-ADD --checksum=${pgvector_release_checksum} \
-  "https://github.com/pgvector/pgvector/archive/refs/tags/v${pgvector_release}.tar.gz" \
+ADD "https://github.com/pgvector/pgvector/archive/refs/tags/v${pgvector_release}.tar.gz" \
   /tmp/pgvector.tar.gz
 
 RUN tar -xvf /tmp/pgvector.tar.gz -C /tmp && \
@@ -350,10 +330,8 @@ RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
 FROM build-pgdev AS pganon
 
 ARG anon_release=1.3.2
-ARG anon_release_checksum=sha256:4a7238e71cf6ea4cf492cdc4bd3fd9b76bbdc4053d5dd696ba3fe1fa2ab3c318
 
-ADD --checksum=${anon_release_checksum} \
-  "https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anon_release}/postgresql_anonymizer-${anon_release}.tar.gz" \
+ADD "https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anon_release}/postgresql_anonymizer-${anon_release}.tar.gz" \
   /tmp/anon.tar.gz
 
 RUN mkdir /tmp/anon && \
@@ -377,10 +355,8 @@ FROM build-pgdev AS pgcron
 
 # Télécharger
 ARG pg_cron_release=1.6.2
-ARG pg_cron_release_checksum=sha256:9f4eb3193733c6fa93a6591406659aac54b82c24a5d91ffaf4ec243f717d94a0
 
-ADD --checksum=${pg_cron_release_checksum} \
-    "https://github.com/citusdata/pg_cron/archive/refs/tags/v${pg_cron_release}.tar.gz" \
+ADD "https://github.com/citusdata/pg_cron/archive/refs/tags/v${pg_cron_release}.tar.gz" \
     /tmp/pg_cron.tar.gz
 
 # Extraire

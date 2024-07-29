@@ -1,5 +1,14 @@
-GET http://localhost:5984/{{$dotenv COUCH_DB_PASSWORD}}
+@p={{$dotenv COUCH_DB_PASSWORD}}
+@baseUrl = http://root:{{p}}@localhost:5984
+
+GET http://localhost:5984/
 
 
 ### List of databases
-curl -X GET http://admin:supermotdepasse@localhost:5984/_all_dbs
+GET {{baseUrl}}/_all_dbs
+
+### 
+https://echo.free.beeceptor.com
+Content-Type: application/json
+
+{ "test": "{{p}}" }
