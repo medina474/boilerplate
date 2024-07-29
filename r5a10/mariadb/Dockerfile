@@ -4,30 +4,14 @@ FROM redhat/ubi9-minimal
 RUN groupadd --gid 999 -r mysql && \
 	useradd -r -g mysql mysql --home-dir /var/lib/mysql --uid 999
 
-ENV GOSU_VERSION=1.17
-RUN set -eux; \
-	rpmArch="$(rpm --query --queryformat='%{ARCH}' rpm)"; \
-	case "$rpmArch" in \
-		aarch64) dpkgArch='arm64' ;; \
-		armv7*) dpkgArch='armhf' ;; \
-		i686) dpkgArch='i386' ;; \
-		ppc64le) dpkgArch='ppc64el' ;; \
-		s390x|riscv64) dpkgArch=$rpmArch ;; \
-		x86_64) dpkgArch='amd64' ;; \
-		*) echo >&2 "error: unknown/unsupported architecture '$rpmArch'"; exit 1 ;; \
-	esac; \
-	curl --fail --location --output /usr/local/bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-${dpkgArch} ; \
-	curl --fail --location --output /usr/local/bin/gosu.asc https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-${dpkgArch}.asc; \
-	GNUPGHOME="$(mktemp -d)"; \
-	export GNUPGHOME; \
-	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-	chmod a+x /usr/local/bin/gosu; \
-	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-	gpgconf --kill all; \
-	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-	gosu --version; \
-	gosu nobody true
+ADD --chmod=0755 \
+  https://github.com/tianon/gosu/releases/download/1.17/gosu-amd64 \
+  /usr/local/bin/gosu
 
+RUN set -eux; \
+	gosu --version; \
+ 	gosu nobody true
+	
 COPY docker.cnf /etc/my.cnf.d/
 
 COPY MariaDB.repo /etc/yum.repos.d/
@@ -71,11 +55,7 @@ RUN set -eux ; \
 	ln -s /usr/lib64/galera-4/libgalera_smm.so /usr/lib64/galera/libgalera_smm.so ; \
 	microdnf clean all ; \
 	rmdir /var/lib/mysql/mysql ; \
-	chown -R mysql:mysql /var/lib/mysql /run/mariadb ; \
-	mkdir /licenses ; \
-	ln -s /usr/share/doc/MariaDB-server-11.4.2/COPYING /licenses/GPL-2 ; \
-	ln -s /usr/share/licenses /licenses/package-licenses ; \
-	ln -s Apache-2.0-license /licenses/gosu
+	chown -R mysql:mysql /var/lib/mysql /run/mariadb ; 
 
 VOLUME /var/lib/mysql
 

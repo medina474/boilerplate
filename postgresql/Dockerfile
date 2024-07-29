@@ -1,4 +1,4 @@
-#docker build ./ -t boilerplate/postgresql:2024.04
+#docker build ./ -t boilerplate/postgresql:2024.07
 FROM debian:testing-slim AS build-essential
 
 RUN set -eux; \
@@ -10,8 +10,15 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
-  checkinstall \
+#  checkinstall \
   ;
+
+# checkinstall n'est plus disponible dans testing
+ADD packages/checkinstall_1.6.2+git20170426.d24a630-3+b1_amd64.deb \  
+  /tmp/checkinstall.deb
+
+RUN set -eux; \
+ apt-get install -y /tmp/checkinstall.deb;
 
 FROM build-essential AS build-pgdev
 
@@ -398,31 +405,14 @@ RUN set -ex; \
 
 # grab gosu for easy step-down from root
 # https://github.com/tianon/gosu/releases
-# ENV GOSU_VERSION 1.17
-# RUN set -eux; \
-# 	savedAptMark="$(apt-mark showmanual)"; \
-# 	apt-get update; \
-# 	apt-get install -y --no-install-recommends ca-certificates wget; \
-# 	rm -rf /var/lib/apt/lists/*; \
-# 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-# 	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-# 	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
-# 	export GNUPGHOME="$(mktemp -d)"; \
-# 	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-# 	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-# 	gpgconf --kill all; \
-# 	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-# 	apt-mark auto '.*' > /dev/null; \
-# 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
-# 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-# 	chmod +x /usr/local/bin/gosu; \
-# 	gosu --version; \
-# 	gosu nobody true
 
 ADD --chmod=0755 \
-  https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 \
+  https://github.com/tianon/gosu/releases/download/1.17/gosu-amd64 \
   /usr/local/bin/gosu
 
+RUN set -eux; \
+	gosu --version; \
+ 	gosu nobody true
 
 # make the "fr_FR.UTF-8" locale so postgres will be utf-8 enabled by default
 RUN set -eux; \
