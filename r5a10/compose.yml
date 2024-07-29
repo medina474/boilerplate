@@ -260,3 +260,20 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
+
+# postgrest
+  postgrest:
+    container_name:  r5a10-postgrest
+    image: postgrest/postgrest:${POSTGREST_VERSION:-v12.2.2}
+#    depends_on:
+#      postgresql:
+#        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${POSTGREST_USER}:${DB_ROOT_PASSWORD}@${POSTGREST_HOST}:${POSTGREST_DB_PORT:-5432}/${POSTGREST_DB}
+      PGRST_DB_SCHEMAS: ${POSTGREST_DB_SCHEMAS:-public}
+      PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE:-anon}
+      PGRST_JWT_SECRET: ${POSTGREST_JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: ${POSTGREST_DB_USE_LEGACY_GUCS:-false}
+      PGRST_APP_SETTINGS_JWT_SECRET: ${POSTGREST_APP_SETTINGS_JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: ${POSTGREST_APP_SETTINGS_JWT_EXP}
+    command: postgrest
