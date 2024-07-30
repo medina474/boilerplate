@@ -14,7 +14,7 @@ RUN set eux; \
   apt-get install -y -t testing \
     libgeos-c1v5 \
     libjson-c5 \
-    -t testing libgdal34 \
+    libgdal35 \
     libboost-serialization1.83.0 \
     /tmp/sfcgal_1.5.1-1_amd64.deb \
     /tmp/postgis_3.5.0-1_amd64.deb \

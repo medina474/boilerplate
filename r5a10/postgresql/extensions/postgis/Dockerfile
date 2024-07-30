@@ -97,7 +97,7 @@ RUN ./configure --with-sfcgal; \
 
 # Create debian package
 RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
-  --requires=libgeos-c1v5,libproj25,libjson-c5,libprotobuf-c1,libgdal34 \
+  --requires=libgeos-c1v5,libproj25,libjson-c5,libprotobuf-c1,libgdal35 \
   --pkgname=postgis --pkgversion=${postgis_release} \
   --nodoc
 
