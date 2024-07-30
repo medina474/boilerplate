@@ -21,3 +21,7 @@ RUN echo "daemonize yes" >> /etc/redis.conf
 CMD /usr/bin/redis-server /etc/redis.conf && /usr/local/bin/webdis /etc/webdis.prod.json
 
 EXPOSE 7379
+
+
+
+docker build ./ -t boilerplate/build:2024.04

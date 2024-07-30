@@ -455,7 +455,7 @@ ENV PG_MAJOR=16
 ENV PATH=$PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 
 ENV PG_VERSION=16.2-1.pgdg120+2
-
+  
 RUN set -ex; \
 	\
 # see note below about "*.pyc" files

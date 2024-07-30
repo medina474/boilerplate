@@ -1,6 +1,8 @@
 configs:
   mariadb_initdb:
     file: ./mariadb/docker-entrypoint-initdb.d
+  postgresql_initdb:
+    file: ./postgresql/docker-entrypoint-initdb.d
   prometheus_config:
     file: ./prometheus/prometheus.yml
   grafana_provisioning:
@@ -20,6 +22,7 @@ volumes:
   couchdb: {}
   neo4j: {}
   minio: {}
+  postgresql: {}
 
 services:
 
@@ -47,7 +50,7 @@ services:
       start_period: 20s
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_USER: ${DB_NAME}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
 # Redis
@@ -216,7 +219,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
 
 # CouchDB
-#
+# Single-node document database
 # https://couchdb.apache.org/
   couchdb:
     container_name: r5a10-couchdb
@@ -244,6 +247,8 @@ services:
       NEO4J_AUTH: neo4j/${DB_ROOT_PASSWORD}
 
 # MinIO
+# high-performance, Amazon S3 compatible object store. It is built for large scale AI/ML, data lake and database workloads. 
+# https://min.io/
   minio:
     container_name: r5a10-minio
     image: minio/minio
@@ -261,13 +266,41 @@ services:
       - 9000:9000
       - 9001:9001
 
-# postgrest
+# PostgreSQL
+# The world's most advanced open source relational database
+# https://www.postgresql.org/
+  postgresql:
+    container_name:  r5a10-postgresql
+    build:
+      context: ./postgresql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_ROOT_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5432:5432
+    configs:
+      - source: postgresql_initdb
+        target: /docker-entrypoint-initdb.d/
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d ${DB_NAME}'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# PostgREST
+# Serve a fully RESTful API from any existing PostgreSQL database. 
+# It provides a cleaner, more standards-compliant, faster API than you are likely to write from scratch.
+# https://docs.postgrest.org/en/v12/
   postgrest:
     container_name:  r5a10-postgrest
     image: postgrest/postgrest:${POSTGREST_VERSION:-v12.2.2}
-#    depends_on:
-#      postgresql:
-#        condition: service_healthy
+    depends_on:
+      postgresql:
+        condition: service_healthy
     environment:
       PGRST_DB_URI: postgres://${POSTGREST_USER}:${DB_ROOT_PASSWORD}@${POSTGREST_HOST}:${POSTGREST_DB_PORT:-5432}/${POSTGREST_DB}
       PGRST_DB_SCHEMAS: ${POSTGREST_DB_SCHEMAS:-public}
@@ -277,3 +310,31 @@ services:
       PGRST_APP_SETTINGS_JWT_SECRET: ${POSTGREST_APP_SETTINGS_JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${POSTGREST_APP_SETTINGS_JWT_EXP}
     command: postgrest
+
+# PostGraphile
+# Instant GraphQL API
+# https://www.graphile.org/postgraphile/
+  postgraphile:
+    container_name: r5a10-postgraphile
+    build:
+      context: ./postgraphile
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    command:
+      [
+        "--port", "${POSTGRAPHILE_PORT:-5000}",
+        "--schema", "${POSTGRAPHILE_SCHEMA:-public}",
+        "--enhance-graphiql",
+        "--cors",
+        "--allow-explain",
+        "--dynamic-json",
+        "--append-plugins",
+        "postgraphile-plugin-connection-filter,postgraphile-plugin-fulltext-filter,@graphile/postgis,postgraphile-plugin-connection-filter-postgis"
+      ]
+    environment:
+      - PGHOST=${POSTGRAPHILE_HOST:-postgresql}
+      - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
+      - PGDATABASE=${DB_NAME}
+      - PGUSER=${DB_ROOT_USER}
+      - PGPASSWORD=${DB_ROOT_PASSWORD}
