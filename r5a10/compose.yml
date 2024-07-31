@@ -139,6 +139,23 @@ services:
       EMAIL_SMTP_HOST: ${DIRECTUS_SMTP_HOST:-inbucket}
       EMAIL_SMTP_PORT: ${DIRECTUS_SMTP_PORT:-2500}
 
+# Strapi
+  strapi:
+    container_name: strapi
+    image: strapi/strapi
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgresql
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+    ports:
+      - 1337:1337
+    volumes:
+      - ./data/strapi:/srv/app
+
 # Inbucket
 # Email testing application;
 # it will accept messages for any email address and make them available to view via a web interface.
@@ -247,7 +264,7 @@ services:
       NEO4J_AUTH: neo4j/${DB_ROOT_PASSWORD}
 
 # MinIO
-# high-performance, Amazon S3 compatible object store. It is built for large scale AI/ML, data lake and database workloads. 
+# high-performance, Amazon S3 compatible object store. It is built for large scale AI/ML, data lake and database workloads.
 # https://min.io/
   minio:
     container_name: r5a10-minio
@@ -292,7 +309,7 @@ services:
       start_period: 30s
 
 # PostgREST
-# Serve a fully RESTful API from any existing PostgreSQL database. 
+# Serve a fully RESTful API from any existing PostgreSQL database.
 # It provides a cleaner, more standards-compliant, faster API than you are likely to write from scratch.
 # https://docs.postgrest.org/en/v12/
   postgrest:
