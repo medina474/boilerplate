@@ -338,3 +338,12 @@ services:
       - PGDATABASE=${DB_NAME}
       - PGUSER=${DB_ROOT_USER}
       - PGPASSWORD=${DB_ROOT_PASSWORD}
+
+# FerretDB
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb
+    container_name: ferretdb
+    ports:
+      - 27017:27017
+    environment:
+      FERRETDB_POSTGRESQL_URL: postgres://${DB_ROOT_USER}:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}

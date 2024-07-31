@@ -55,7 +55,7 @@ RUN set -eux; \
   ;
 
 WORKDIR /tmp/age-PG16-v${age_release}
-#RUN make -j$(nproc) install
+RUN make -j$(nproc) install
 
 # Create debian package
 #RUN checkinstall -D --install=no --fstrans=no --backup=no --pakdir=/tmp \
