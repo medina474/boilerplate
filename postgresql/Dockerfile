@@ -14,11 +14,8 @@ RUN set -eux; \
   ;
 
 # checkinstall n'est plus disponible dans testing
-ADD packages/checkinstall_1.6.2+git20170426.d24a630-3+b1_amd64.deb \  
-  /tmp/checkinstall.deb
-
-RUN set -eux; \
- apt-get install -y /tmp/checkinstall.deb;
+ADD http://maquette.neotech.fr/debian/checkinstall_1.6.2+git20170426.d24a630-3+b1_amd64.deb /tmp
+RUN apt-get install -y /tmp/checkinstall_1.6.2+git20170426.d24a630-3+b1_amd64.deb;
 
 FROM build-essential AS build-pgdev
 
@@ -455,7 +452,7 @@ ENV PG_MAJOR=16
 ENV PATH=$PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 
 ENV PG_VERSION=16.2-1.pgdg120+2
-  
+
 RUN set -ex; \
 	\
 # see note below about "*.pyc" files
