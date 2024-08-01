@@ -34,7 +34,7 @@ RUN set -eux; \
 # pgVector
 FROM build-pgdev AS pgvector
 
-ARG pgvector_release=0.6.2
+ARG pgvector_release=0.7.3
 
 ADD "https://github.com/pgvector/pgvector/archive/refs/tags/v${pgvector_release}.tar.gz" \
   /tmp/pgvector.tar.gz

@@ -35,7 +35,7 @@ RUN set -eux; \
 
 FROM build-pgdev AS timescaledb
 
-ARG timescaledb_release=2.13.0
+ARG timescaledb_release=2.16.0
 
 # Download and extract
 ADD "https://github.com/timescale/timescaledb/archive/refs/tags/${timescaledb_release}.tar.gz" \
