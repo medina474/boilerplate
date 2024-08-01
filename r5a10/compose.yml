@@ -17,6 +17,7 @@ volumes:
   grafana: {}
   inbucket_config: {}
   inbucket_storage: {}
+  mailpit: {}
   mongodb: {}
   mongodb_configdb: {}
   couchdb: {}
@@ -140,6 +141,8 @@ services:
       EMAIL_SMTP_PORT: ${DIRECTUS_SMTP_PORT:-2500}
 
 # Strapi
+# Open-source headless CMS 100% JavaScript
+# https://strapi.io/
   strapi:
     container_name: strapi
     image: strapi/strapi
@@ -160,17 +163,31 @@ services:
 # Email testing application;
 # it will accept messages for any email address and make them available to view via a web interface.
 # https://inbucket.org/
-  inbucket:
-    container_name: r5a10-inbucket
-    image: inbucket/inbucket:${INBUCKET_VERSION:-3.0.3}
-    ports:
-      - '2500:2500' # SMTP
-      - '1100:1100' # POP3
-      - '8082:9000' # web interface
-    volumes:
-      - inbucket_config:/config
-      - inbucket_storage:/storage
+  # inbucket:
+  #   container_name: r5a10-inbucket
+  #   image: inbucket/inbucket:${INBUCKET_VERSION:-3.0.3}
+  #   ports:
+  #     - '2500:2500' # SMTP
+  #     - '1100:1100' # POP3
+  #     - '8082:9000' # web interface
+  #   volumes:
+  #     - inbucket_config:/config
+  #     - inbucket_storage:/storage
 
+# Mailpit
+# email & SMTP testing tool with API for developers
+# https://mailpit.axllent.org/
+  mailpit:
+    container_name: r5a10-mailpit
+    image: axllent/mailpit:${MAILPIT_VERSION:-v1.19}
+    ports:
+      - 8025:8025
+      - 1025:1025
+    volumes:
+      - mailpit:/data
+    environment:
+      TZ: Europe/Paris
+    
 # Prometheus
 # Monitoring system & time series database
 # https://prometheus.io/
@@ -357,6 +374,8 @@ services:
       - PGPASSWORD=${DB_ROOT_PASSWORD}
 
 # FerretDB
+# A truly Open Source MongoDB alternative, built on Postgres
+# https://www.ferretdb.com/
   ferretdb:
     image: ghcr.io/ferretdb/ferretdb
     container_name: ferretdb

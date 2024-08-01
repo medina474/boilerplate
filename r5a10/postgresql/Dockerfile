@@ -46,3 +46,7 @@ RUN apt-get install /tmp/madlib_2.1.0-1_amd64.deb
 RUN set eux; \
   apt-get clean; \
   rm -rf /var/lib/apt/lists/*;
+
+ADD extensions/age/age.so /usr/lib/postgresql/16/lib/
+ADD extensions/age/age.control /usr/share/postgresql/13/extension/
+ADD extensions/age/age--1.5.0.sql /usr/share/postgresql/13/extension/
