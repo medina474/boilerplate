@@ -22,8 +22,10 @@ volumes:
   mongodb_configdb: {}
   couchdb: {}
   neo4j: {}
+  neo4j_logs: {}
   minio: {}
   postgresql: {}
+  ferretdb: {}
 
 services:
 
@@ -187,7 +189,7 @@ services:
       - mailpit:/data
     environment:
       TZ: Europe/Paris
-    
+
 # Prometheus
 # Monitoring system & time series database
 # https://prometheus.io/
@@ -277,6 +279,7 @@ services:
       - 7687:7687
     volumes:
       - neo4j:/data
+      - neo4j_logs:/logs
     environment:
       NEO4J_AUTH: neo4j/${DB_ROOT_PASSWORD}
 
@@ -378,8 +381,29 @@ services:
 # https://www.ferretdb.com/
   ferretdb:
     image: ghcr.io/ferretdb/ferretdb
-    container_name: ferretdb
+    container_name: r5a10-ferretdb
     ports:
       - 27018:27017
+    volumes:
+      - ferretdb:/state
     environment:
       FERRETDB_POSTGRESQL_URL: postgres://${DB_ROOT_USER}:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}
+
+# imgproxy
+# Optimize images for web on the fly
+# https://imgproxy.net/
+  imgproxy:
+    image: darthsim/imgproxy:v3.25
+    container_name: r5a10-imgproxy
+    healthcheck:
+      test: [ "CMD", "imgproxy", "health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    environment:
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: true
+      IMGPROXY_ENABLE_WEBP_DETECTION: true
+      IMGPROXY_ENABLE_AVIF_DETECTION: true
+    volumes:
+      - ./volumes/storage:/var/lib/storage:z
