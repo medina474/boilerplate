@@ -43,6 +43,14 @@ RUN apt-get install /tmp/pgvector_0.6.2-1_amd64.deb
 ADD http://maquette.neotech.fr/debian/madlib_2.1.0-1_amd64.deb /tmp
 RUN apt-get install /tmp/madlib_2.1.0-1_amd64.deb
 
+# Exporter
+
+RUN apt-get install -y tar 
+
+ADD https://github.com/prometheus-community/postgres_exporter/releases/download/v0.15.0/postgres_exporter-0.15.0.linux-amd64.tar.gz /tmp
+WORKDIR /tmp
+# RUN tar xvfz postgres_exporter-0.15.0.linux-amd64.tar.gz
+
 RUN set eux; \
   apt-get clean; \
   rm -rf /var/lib/apt/lists/*;

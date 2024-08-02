@@ -380,6 +380,6 @@ services:
     image: ghcr.io/ferretdb/ferretdb
     container_name: ferretdb
     ports:
-      - 27017:27017
+      - 27018:27017
     environment:
       FERRETDB_POSTGRESQL_URL: postgres://${DB_ROOT_USER}:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}
