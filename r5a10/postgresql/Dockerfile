@@ -47,8 +47,6 @@ RUN apt-get install ./madlib_2.1.0-1_amd64.deb
 
 # Exporter
 
-#RUN apt-get install -y tar
-
 ADD https://github.com/prometheus-community/postgres_exporter/releases/download/v0.15.0/postgres_exporter-0.15.0.linux-amd64.tar.gz ./
 RUN set -eux; \
   tar xfz postgres_exporter-0.15.0.linux-amd64.tar.gz; \
@@ -59,6 +57,6 @@ RUN set eux; \
   rm -rf /var/lib/apt/lists/*; \
   rm -rf /tmp/*.deb;
 
-#ADD extensions/age/age.so /usr/lib/postgresql/16/lib/
-#ADD extensions/age/age.control /usr/share/postgresql/13/extension/
-#ADD extensions/age/age--1.5.0.sql /usr/share/postgresql/13/extension/
+ADD extensions/age/age.so /usr/lib/postgresql/16/lib/
+ADD extensions/age/age.control /usr/share/postgresql/13/extension/
+ADD extensions/age/age--1.5.0.sql /usr/share/postgresql/13/extension/

@@ -146,7 +146,7 @@ services:
 # Open-source headless CMS 100% JavaScript
 # https://strapi.io/
   strapi:
-    container_name: strapi
+    container_name: r5a10-strapi
     image: strapi/strapi
     environment:
       NODE_ENV: production
@@ -372,9 +372,9 @@ services:
     environment:
       - PGHOST=${POSTGRAPHILE_HOST:-postgresql}
       - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
-      - PGDATABASE=${DB_NAME}
-      - PGUSER=${DB_ROOT_USER}
+      - PGUSER=postgres
       - PGPASSWORD=${DB_ROOT_PASSWORD}
+      - PGDATABASE=${DB_NAME}
 
 # FerretDB
 # A truly Open Source MongoDB alternative, built on Postgres
@@ -387,7 +387,7 @@ services:
     volumes:
       - ferretdb:/state
     environment:
-      FERRETDB_POSTGRESQL_URL: postgres://${DB_ROOT_USER}:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}
+      FERRETDB_POSTGRESQL_URL: postgres://postgres:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}
 
 # imgproxy
 # Optimize images for web on the fly
