@@ -150,8 +150,8 @@ services:
 # Open-source headless CMS 100% JavaScript
 # https://strapi.io/
   strapi:
-    container_name: strapi
-    image: strapi/strapi
+    container_name: r5a10-strapi
+    image: naskio/strapi:${STRAPI_VERSION:-4.25.6}
     environment:
       NODE_ENV: development
       DATABASE_CLIENT: postgres
@@ -412,6 +412,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${DB_ROOT_USER}
       RABBITMQ_DEFAULT_PASS: ${DB_ROOT_PASSWORD}
+
 # imgproxy
 # Optimize images for web on the fly
 # https://imgproxy.net/
