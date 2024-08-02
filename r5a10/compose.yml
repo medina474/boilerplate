@@ -9,6 +9,8 @@ configs:
     file: ./grafana/provisioning
   grafana_dashboards:
     file: ./grafana/dashboards
+  rabbit_enabled_plugins:
+    file: ./rabbit_enabled_plugins
 
 volumes:
   mariadb: {}
@@ -26,6 +28,8 @@ volumes:
   minio: {}
   postgresql: {}
   ferretdb: {}
+  rabbitmq: {}
+  rabbitmq_log: {}
 
 services:
 
@@ -149,7 +153,7 @@ services:
     container_name: strapi
     image: strapi/strapi
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgresql
       DATABASE_PORT: 5432
@@ -380,8 +384,8 @@ services:
 # A truly Open Source MongoDB alternative, built on Postgres
 # https://www.ferretdb.com/
   ferretdb:
-    image: ghcr.io/ferretdb/ferretdb
     container_name: r5a10-ferretdb
+    image: ghcr.io/ferretdb/ferretdb
     ports:
       - 27018:27017
     volumes:
@@ -389,6 +393,25 @@ services:
     environment:
       FERRETDB_POSTGRESQL_URL: postgres://${DB_ROOT_USER}:${DB_ROOT_PASSWORD}@postgresql:5432/${DB_NAME}
 
+# RabbitMQ
+# One broker to queue them all
+# https://www.rabbitmq.com/
+  rabbitmq:
+    image: rabbitmq:3.13
+    container_name: rabbitmq
+    ports:
+      - 1883:1883
+      - 15672:15672
+      - 61613:61613
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+    configs:
+      - source: rabbit_enabled_plugins
+        target: /etc/rabbitmq/enabled_plugins
+    environment:
+      RABBITMQ_DEFAULT_USER: ${DB_ROOT_USER}
+      RABBITMQ_DEFAULT_PASS: ${DB_ROOT_PASSWORD}
 # imgproxy
 # Optimize images for web on the fly
 # https://imgproxy.net/
