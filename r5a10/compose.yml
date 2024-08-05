@@ -47,8 +47,8 @@ services:
         target: /docker-entrypoint-initdb.d
     volumes:
       - mariadb:/var/lib/mysql
-    ports:
-      - 3306:${MARIADB_PORT:-3306}
+    #ports:
+    #  - 3306:3306
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 30s
