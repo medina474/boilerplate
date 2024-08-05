@@ -376,9 +376,9 @@ services:
     environment:
       - PGHOST=${POSTGRAPHILE_HOST:-postgresql}
       - PGPORT=${POSTGRAPHILE_DB_PORT:-5432}
-      - PGDATABASE=${DB_NAME}
-      - PGUSER=${DB_ROOT_USER}
+      - PGUSER=postgres
       - PGPASSWORD=${DB_ROOT_PASSWORD}
+      - PGDATABASE=${DB_NAME}
 
 # FerretDB
 # A truly Open Source MongoDB alternative, built on Postgres
