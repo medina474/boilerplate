@@ -1,5 +1,5 @@
-version: "3.8"
-
+# https://github.com/deviantony/docker-elk/tree/main
+# https://www.elastic.co/fr/blog/getting-started-with-the-elastic-stack-and-docker-compose
 volumes:
   esdata01:
     driver: local
@@ -118,6 +118,7 @@ services:
       timeout: 10s
       retries: 120
 
+  # Username: elastic
   kibana:
     container_name: kibana
     depends_on:
