@@ -24,4 +24,4 @@ EXPOSE 7379
 
 
 
-docker build ./ -t boilerplate/build:2024.04
+docker build ./ -t boilerplate/build:2024.07
